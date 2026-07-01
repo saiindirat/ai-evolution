@@ -1,0 +1,533 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>How Machines Learned to Think</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,400;12..96,600;12..96,800&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet" />
+<style>
+  :root{
+    --ink:#14122B; --ink-2:#1C1940; --surface:#211D47; --surface-2:#2A2557;
+    --line:rgba(170,160,230,0.16); --line-strong:rgba(170,160,230,0.30);
+    --text:#ECEAF8; --muted:#A09CC4; --faint:#726E9A;
+    --accent:#6E8FE0; --accent-soft:rgba(110,143,224,0.16);
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  html{scroll-behavior:smooth}
+  body{
+    background:
+      radial-gradient(1200px 700px at 80% -10%, rgba(110,143,224,0.10), transparent 60%),
+      radial-gradient(900px 600px at -10% 30%, rgba(240,102,75,0.06), transparent 55%),
+      var(--ink);
+    color:var(--text); font-family:'Inter',system-ui,sans-serif; line-height:1.55;
+    -webkit-font-smoothing:antialiased; overflow-x:hidden;
+  }
+  .wrap{max-width:920px;margin:0 auto;padding:0 20px}
+
+  /* HERO */
+  header{padding:60px 0 26px}
+  .eyebrow{font-family:'JetBrains Mono',monospace;font-size:12px;letter-spacing:0.28em;text-transform:uppercase;color:var(--accent);transition:color .6s ease}
+  h1{font-family:'Bricolage Grotesque',sans-serif;font-weight:800;font-size:clamp(2.4rem,8vw,4.4rem);line-height:0.98;letter-spacing:-0.02em;margin:14px 0 12px}
+  h1 .glow{background:linear-gradient(100deg,#6E8FE0,#5BD49B 40%,#F0C24B 70%,#F0664B);-webkit-background-clip:text;background-clip:text;color:transparent}
+  .pulse-line{height:2px;width:100%;margin:6px 0 18px;background:linear-gradient(90deg,transparent,var(--accent),transparent);background-size:220% 100%;animation:slide 3.4s linear infinite;opacity:.7;transition:background .6s}
+  @keyframes slide{0%{background-position:120% 0}100%{background-position:-120% 0}}
+  .lede{font-size:clamp(1rem,2.4vw,1.18rem);color:var(--muted);max-width:62ch}
+  .ribbon{display:flex;flex-wrap:wrap;gap:8px;margin-top:24px;align-items:center;font-family:'JetBrains Mono',monospace;font-size:12.5px}
+  .ribbon span{padding:5px 11px;border:1px solid var(--line);border-radius:999px;color:var(--muted)}
+  .ribbon b{color:var(--faint);font-weight:400}
+
+  section{padding:32px 0;border-top:1px solid var(--line)}
+  .sec-label{font-family:'JetBrains Mono',monospace;font-size:11.5px;letter-spacing:0.24em;text-transform:uppercase;color:var(--faint);margin-bottom:16px}
+
+  /* TIMELINE RAIL */
+  .rail{display:flex;gap:10px;overflow-x:auto;padding:4px 2px 14px;scroll-snap-type:x mandatory;-webkit-overflow-scrolling:touch}
+  .rail::-webkit-scrollbar{height:6px}
+  .rail::-webkit-scrollbar-thumb{background:var(--line-strong);border-radius:999px}
+  .chip{flex:0 0 auto;scroll-snap-align:start;cursor:pointer;background:var(--ink-2);border:1px solid var(--line);border-radius:14px;padding:12px 15px;min-width:138px;transition:border-color .25s,transform .25s,background .25s}
+  .chip:hover{transform:translateY(-2px)}
+  .chip .num{font-family:'JetBrains Mono',monospace;font-size:12px;color:var(--c)}
+  .chip .nm{font-family:'Bricolage Grotesque',sans-serif;font-weight:600;font-size:15px;margin-top:3px}
+  .chip .yr{font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--faint);margin-top:2px}
+  .chip[data-active="true"]{background:var(--surface);border-color:var(--c);box-shadow:0 0 0 1px var(--c) inset}
+
+  /* VIZ BANNER */
+  .viz{position:relative;border:1px solid var(--line);border-radius:18px;overflow:hidden;background:radial-gradient(120% 130% at 25% 10%, var(--accent-soft), transparent 60%), var(--ink-2);height:230px;transition:background .6s ease;margin-bottom:18px}
+  .viz canvas{display:block;width:100%;height:100%}
+  .viz .cap{position:absolute;left:15px;bottom:12px;right:15px;font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--muted);letter-spacing:.04em}
+  .viz .cap b{color:var(--accent);font-weight:500;transition:color .6s}
+
+  /* DETAIL */
+  .detail{background:var(--ink-2);border:1px solid var(--line);border-radius:18px;padding:24px}
+  .top{display:flex;align-items:baseline;gap:12px;flex-wrap:wrap}
+  .big{font-family:'JetBrains Mono',monospace;font-size:13px;color:var(--accent);transition:color .6s}
+  .detail h2{font-family:'Bricolage Grotesque',sans-serif;font-weight:800;font-size:clamp(1.5rem,4.5vw,2rem);letter-spacing:-0.01em;line-height:1.05}
+  .yrs{font-family:'JetBrains Mono',monospace;font-size:12px;color:var(--faint)}
+
+  #d-content{transition:opacity .35s ease, transform .35s ease}
+  #d-content.swap{opacity:0;transform:translateY(8px)}
+
+  .eli{font-size:1.05rem;color:var(--text);margin:16px 0 4px;font-weight:500}
+  .eli .lead{color:var(--accent);transition:color .6s}
+  .body{color:var(--muted);font-size:0.97rem;margin-top:10px}
+
+  .block{margin-top:20px}
+  .blabel{font-family:'JetBrains Mono',monospace;font-size:10.5px;letter-spacing:.18em;text-transform:uppercase;color:var(--faint);margin-bottom:9px}
+  .story{font-size:0.98rem;color:var(--text);line-height:1.62}
+  .story b{color:#fff;font-weight:600}
+  .story i{color:var(--accent);font-style:normal}
+
+  .cast{display:flex;flex-wrap:wrap;gap:8px}
+  .person{background:var(--surface);border:1px solid var(--line);border-radius:11px;padding:8px 12px;font-size:13px;line-height:1.35;max-width:100%}
+  .person .nm{font-weight:600;color:var(--accent);font-family:'Bricolage Grotesque',sans-serif;transition:color .6s}
+  .person .rl{color:var(--muted);font-size:12px}
+
+  .stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(118px,1fr));gap:10px}
+  .stat{background:linear-gradient(160deg,var(--surface),var(--ink-2));border:1px solid var(--line);border-radius:13px;padding:13px 14px;opacity:0;animation:rise .5s ease forwards}
+  @keyframes rise{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
+  .stat-n{font-family:'Bricolage Grotesque',sans-serif;font-weight:800;font-size:1.5rem;color:var(--accent);transition:color .6s;line-height:1}
+  .stat-l{font-size:11.5px;color:var(--muted);margin-top:6px;line-height:1.3}
+
+  .moment{padding:12px 14px;border-left:2px solid var(--accent);background:var(--accent-soft);border-radius:0 10px 10px 0;transition:border-color .6s,background .6s}
+  .moment .k{font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--accent);letter-spacing:.1em;text-transform:uppercase;transition:color .6s}
+  .moment p{font-size:0.94rem;color:var(--text);margin-top:4px}
+
+  .uses{list-style:none;display:flex;flex-direction:column;gap:8px}
+  .uses li{position:relative;padding-left:20px;font-size:0.94rem;color:var(--muted)}
+  .uses li::before{content:"";position:absolute;left:2px;top:8px;width:7px;height:7px;border-radius:50%;background:var(--accent);transition:background .6s}
+
+  .pills{display:flex;flex-wrap:wrap;gap:8px;margin-top:10px}
+  .pill{cursor:pointer;border:1px dashed var(--line-strong);border-radius:999px;padding:6px 13px;font-size:13px;color:var(--text);background:transparent;font-family:'JetBrains Mono',monospace;transition:all .2s;user-select:none}
+  .pill:hover{border-color:var(--accent);color:var(--accent)}
+  .pill[data-open="true"]{background:var(--accent-soft);border-style:solid;border-color:var(--accent);color:var(--text)}
+  .pill .def{display:none;font-family:'Inter',sans-serif;color:var(--muted)}
+  .pill[data-open="true"] .def{display:inline}
+  .pill[data-open="true"] .term::after{content:" \2014";color:var(--faint)}
+
+  .navbtns{display:flex;justify-content:space-between;gap:10px;margin-top:24px}
+  .navbtns button{flex:1;background:var(--surface);border:1px solid var(--line);color:var(--text);border-radius:11px;padding:12px;font-family:'Inter';font-size:14px;font-weight:500;cursor:pointer;transition:border-color .2s,background .2s}
+  .navbtns button:hover:not(:disabled){border-color:var(--accent);background:var(--surface-2)}
+  .navbtns button:disabled{opacity:.35;cursor:default}
+
+  /* LANDSCAPE */
+  .grid4{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+  @media(max-width:560px){.grid4{grid-template-columns:1fr}}
+  .force{background:var(--ink-2);border:1px solid var(--line);border-radius:16px;padding:18px}
+  .force .t{font-family:'Bricolage Grotesque',sans-serif;font-weight:600;font-size:1.06rem;margin-bottom:7px}
+  .force .d{font-size:0.91rem;color:var(--muted)}
+  .force .n{font-family:'JetBrains Mono',monospace;font-size:12px;color:#F0C24B;margin-bottom:9px;letter-spacing:.06em}
+
+  /* FLASHCARDS */
+  .card{perspective:1400px;height:210px;cursor:pointer;margin-bottom:14px}
+  .card .inner{position:relative;width:100%;height:100%;transition:transform .6s;transform-style:preserve-3d}
+  .card[data-flip="true"] .inner{transform:rotateY(180deg)}
+  .face{position:absolute;inset:0;backface-visibility:hidden;-webkit-backface-visibility:hidden;border-radius:18px;border:1px solid var(--line);padding:26px;display:flex;flex-direction:column;justify-content:center}
+  .face.front{background:var(--ink-2)}
+  .face.back{background:linear-gradient(135deg,var(--surface),var(--ink-2));transform:rotateY(180deg);border-color:var(--line-strong)}
+  .face .qn{font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--faint);letter-spacing:.16em;text-transform:uppercase;margin-bottom:12px}
+  .face .q{font-family:'Bricolage Grotesque',sans-serif;font-weight:600;font-size:1.18rem;line-height:1.25}
+  .face .a{font-size:1rem;color:var(--text)}
+  .face .hint{font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--faint);margin-top:14px}
+  .cardnav{display:flex;align-items:center;justify-content:space-between;gap:12px}
+  .cardnav button{background:var(--surface);border:1px solid var(--line);color:var(--text);border-radius:11px;padding:10px 18px;cursor:pointer;font-size:14px;font-family:'Inter'}
+  .cardnav button:hover{border-color:var(--accent)}
+  .cardnav .count{font-family:'JetBrains Mono',monospace;font-size:13px;color:var(--muted)}
+
+  .reveal{opacity:0;transform:translateY(16px);transition:opacity .6s ease,transform .6s ease}
+  .reveal.in{opacity:1;transform:none}
+
+  footer{padding:38px 0 70px;border-top:1px solid var(--line);color:var(--faint);font-size:0.9rem}
+  footer b{color:var(--muted);font-weight:600}
+
+  @media (prefers-reduced-motion: reduce){
+    *{scroll-behavior:auto !important;animation:none !important}
+    .reveal{opacity:1;transform:none}
+    .card .inner,#d-content{transition:none}
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <header>
+    <div class="eyebrow" id="eyebrow">A field guide · 7 phases · real names & figures</div>
+    <h1>How machines<br>learned to <span class="glow">think</span></h1>
+    <div class="pulse-line"></div>
+    <p class="lede">The whole history of AI is one idea, scaled up over and over: <em>stop writing the rules yourself — let the machine figure them out.</em> Tap through the phases for the people, the money, and the moments behind each leap.</p>
+    <div class="ribbon">
+      <span>rules</span><b>→</b><span>examples</span><b>→</b><span>bigger brains</span><b>→</b><span>attention</span><b>→</b><span>creating</span><b>→</b><span>acting</span>
+    </div>
+  </header>
+
+  <section>
+    <div class="sec-label">The timeline · tap a phase</div>
+    <div class="rail" id="rail"></div>
+
+    <div class="viz">
+      <canvas id="net"></canvas>
+      <div class="cap">the machine at this stage: <b id="vizlabel">a handful of rigid rules</b></div>
+    </div>
+
+    <div class="detail">
+      <div class="top">
+        <span class="big" id="d-num">PHASE 01</span>
+        <h2 id="d-name">We write the rules</h2>
+        <span class="yrs" id="d-years">1950s–1980s</span>
+      </div>
+
+      <div id="d-content">
+        <p class="eli"><span class="lead">Teach-me-like-I'm-10:</span> <span id="d-eli"></span></p>
+        <p class="body" id="d-body"></p>
+
+        <div class="block">
+          <div class="blabel">The story</div>
+          <p class="story" id="d-story"></p>
+        </div>
+
+        <div class="block">
+          <div class="blabel">Who was in the room</div>
+          <div class="cast" id="d-cast"></div>
+        </div>
+
+        <div class="block">
+          <div class="blabel">By the numbers</div>
+          <div class="stats" id="d-stats"></div>
+        </div>
+
+        <div class="block moment">
+          <div class="k" id="d-mk">Landmark moment</div>
+          <p id="d-moment"></p>
+        </div>
+
+        <div class="block">
+          <div class="blabel">Where you saw it</div>
+          <ul class="uses" id="d-uses"></ul>
+        </div>
+
+        <div class="block">
+          <div class="blabel">Decode the jargon · tap to reveal</div>
+          <div class="pills" id="d-pills"></div>
+        </div>
+      </div>
+
+      <div class="navbtns">
+        <button id="prev">← Previous</button>
+        <button id="next">Next phase →</button>
+      </div>
+    </div>
+  </section>
+
+  <section class="reveal">
+    <div class="sec-label">What's changing the landscape right now · 2026</div>
+    <div class="grid4" id="forces"></div>
+  </section>
+
+  <section class="reveal">
+    <div class="sec-label">Test yourself · tap the card to flip</div>
+    <div class="card" id="card">
+      <div class="inner">
+        <div class="face front">
+          <div class="qn" id="qn">Question 1</div>
+          <div class="q" id="q"></div>
+          <div class="hint">tap to reveal</div>
+        </div>
+        <div class="face back">
+          <div class="qn">Answer</div>
+          <div class="a" id="a"></div>
+          <div class="hint">tap to flip back</div>
+        </div>
+      </div>
+    </div>
+    <div class="cardnav">
+      <button id="cprev">←</button>
+      <span class="count" id="ccount">1 / 6</span>
+      <button id="cnext">→</button>
+    </div>
+  </section>
+
+  <footer>
+    The throughline to carry into any AI conversation: <b>rules → examples → bigger brains → attention → creating → acting.</b> Six steps, one idea scaled up each time. Phase 7 is where the Perplexity application lives — answers becoming actions, with industry layers (Computer for Counsel today; Education the obvious next vertical).
+  </footer>
+
+</div>
+
+<script>
+const PHASES = [
+  {
+    num:"01", name:"We write the rules", years:"1950s–1980s", c:"#6E8FE0",
+    viz:"a handful of rigid rules",
+    eli:"Imagine teaching a kid to cook by handing them an exact recipe: \u201cif the water bubbles, add the pasta.\u201d The computer does only what a human typed in.",
+    body:"This was the era of \u201cexpert systems\u201d \u2014 a specialist\u2019s knowledge written down as thousands of if-then rules. It shone on narrow problems but shattered the moment reality got messy, because you can\u2019t write a rule for everything.",
+    story:"In the summer of 1956, a small group gathered at <b>Dartmouth College</b> and coined a new phrase: <i>artificial intelligence</i>. <b>John McCarthy</b>, <b>Marvin Minsky</b> and others believed human expertise could simply be written down as rules. The poster child came two decades later: in 1978, <b>John McDermott</b> at Carnegie Mellon built <b>XCON</b> for Digital Equipment Corporation \u2014 about 2,500 hand-written rules that configured VAX computers, processed 80,000 orders, and saved DEC an estimated $25 million a year. Governments piled in: Japan bet roughly $400 million on a \u201cFifth Generation\u201d project (1982\u20131992) to leap ahead of America. But the rules were brittle \u2014 every new case needed another rule, until the systems became unmaintainable \u201crat\u2019s nests.\u201d When the specialized-hardware market collapsed in the late 1980s and Japan\u2019s project ended in 1992 with no commercial payoff, the funding evaporated. Researchers had a name for these busts: the <b>AI winter</b>.",
+    cast:[["John McCarthy","coined \u201cAI,\u201d Dartmouth 1956"],["Marvin Minsky","AI founding figure"],["Edward Feigenbaum","\u201cfather of expert systems\u201d"],["John McDermott","built XCON for DEC, 1978"]],
+    stats:[{n:1956,label:"\u201cAI\u201d coined at Dartmouth"},{n:2500,label:"hand-written rules in XCON"},{n:25,pre:"$",suf:"M/yr",label:"XCON saved DEC"},{n:400,pre:"~$",suf:"M",label:"Japan\u2019s Fifth-Gen bet"}],
+    mk:"Where it began",
+    moment:"1956 \u00b7 The term \u201cartificial intelligence\u201d is coined at a summer workshop at Dartmouth College.",
+    uses:["DENDRAL (1965) \u2014 identified molecules from chemical data, the first true expert system","MYCIN \u2014 diagnosed bacterial infections better than some doctors, but was never deployed over liability fears","XCON \u2014 configured DEC\u2019s computers from ~2,500 rules"],
+    pills:[["Expert system","a program that copies a specialist by storing their knowledge as fixed if-then rules."],["AI winter","a stretch where hype outran results and the research money dried up."],["Knowledge engineer","the person whose job was to extract an expert\u2019s know-how and turn it into rules."]]
+  },
+  {
+    num:"02", name:"We show examples", years:"1990s–2000s", c:"#4FC2C9",
+    viz:"patterns learned from data",
+    eli:"Now, instead of the recipe, you let the kid watch you cook 500 times until they spot the pattern themselves.",
+    body:"That\u2019s machine learning: feed the machine piles of examples and it finds the pattern on its own. You don\u2019t define spam \u2014 you show it 10,000 spam emails and it learns the difference.",
+    story:"The fix was to stop writing rules and let machines learn from examples \u2014 and the drama played out on a chessboard. On <b>May 11, 1997</b>, IBM\u2019s <b>Deep Blue</b>, built by engineers <b>Feng-hsiung Hsu</b> and <b>Murray Campbell</b>, beat reigning world champion <b>Garry Kasparov</b> 3.5\u20132.5. Kasparov had crushed the same machine a year earlier; this time he was so rattled by one uncanny move that he accused IBM of cheating. IBM simply dismantled the machine and never granted a rematch. Away from the headlines, quieter machine learning was already woven into daily life \u2014 filtering spam, flagging credit-card fraud, and powering <b>Amazon\u2019s</b> \u201cyou might also like\u201d recommendations.",
+    cast:[["Garry Kasparov","world champion who lost"],["Feng-hsiung Hsu","Deep Blue\u2019s chief architect"],["Murray Campbell","IBM Deep Blue team"]],
+    stats:[{n:1997,label:"Deep Blue beats Kasparov"},{n:3.5,dec:1,suf:"\u20132.5",label:"final match score"},{n:200,suf:"M",label:"chess positions/sec searched"}],
+    mk:"Landmark moment",
+    moment:"May 11, 1997 \u00b7 IBM\u2019s Deep Blue becomes the first machine to beat a reigning world chess champion in a match.",
+    uses:["Spam filters that learn from millions of flagged emails","Credit-card fraud detection","\u201cCustomers who bought this also bought\u2026\u201d recommendations"],
+    pills:[["Machine learning","the machine learns patterns from examples instead of being handed rules."],["Training data","the pile of examples a model studies in order to learn."]]
+  },
+  {
+    num:"03", name:"A bigger, brain-like machine", years:"2012", c:"#5BD49B",
+    viz:"layered networks that can see",
+    eli:"The big leap: build the machine out of many simple parts loosely inspired by brain cells, stacked in deep layers.",
+    body:"These \u201cneural networks,\u201d stacked deep, gave us deep learning. Suddenly computers could see \u2014 reliably telling a cat from a dog \u2014 something earlier methods never cracked.",
+    story:"The brain-inspired idea had been declared dead once already. <b>Frank Rosenblatt\u2019s</b> 1958 Perceptron was hyped by the New York Times as a machine that would soon \u201cwalk, talk, see, write\u201d \u2014 then <b>Marvin Minsky</b> and Seymour Papert\u2019s 1969 book exposed its limits, funding collapsed, and Rosenblatt died in a boating accident in 1971. It roared back fifty years later. In 2009, Stanford\u2019s <b>Fei-Fei Li</b> built <b>ImageNet</b>, a dataset of millions of labeled photos. In 2012, three researchers \u2014 grad student <b>Alex Krizhevsky</b> with <b>Ilya Sutskever</b> and advisor <b>Geoffrey Hinton</b> at Toronto \u2014 entered \u201cAlexNet,\u201d trained on cheap gaming GPUs, and slashed the image-recognition error rate to 15.3%, humiliating the runner-up near 26%. Four years on, <b>DeepMind\u2019s</b> AlphaGo beat Go legend <b>Lee Sedol</b> 4\u20131 before 200M+ viewers; its \u201cMove 37\u201d was so strange that experts first assumed it was a bug.",
+    cast:[["Frank Rosenblatt","Perceptron, 1958 (d. 1971)"],["Geoffrey Hinton","\u201cgodfather of deep learning,\u201d Nobel 2024"],["Fei-Fei Li","built ImageNet, 2009"],["Demis Hassabis","DeepMind / AlphaGo"]],
+    stats:[{n:1958,label:"Rosenblatt\u2019s Perceptron"},{n:2012,label:"AlexNet breakthrough"},{n:15.3,dec:1,suf:"%",label:"AlexNet error (vs ~26%)"},{n:4,suf:"\u20131",label:"AlphaGo over Lee Sedol"}],
+    mk:"Two breakthroughs",
+    moment:"2012 \u00b7 AlexNet wins ImageNet and computers can finally \u201csee.\u201d  2016 \u00b7 AlphaGo beats the world\u2019s best Go player.",
+    uses:["Face unlock on your phone","Automatic photo tagging","Voice assistants \u2014 Siri, Alexa"],
+    pills:[["Neural network","a web of simple units, loosely inspired by brain cells, that learn together."],["Deep learning","stacking those networks many layers deep so they can learn complex things."],["GPU","gaming graphics chips that turned out to be perfect for training neural nets fast."]]
+  },
+  {
+    num:"04", name:"A better way to pay attention", years:"2017", c:"#C7D45B",
+    viz:"attention weighing every word",
+    eli:"The quiet hero of the whole story. The machine gets a new trick: weigh which words in a sentence matter most to each other \u2014 all at once, instead of plodding word by word.",
+    body:"This design is called the Transformer. Boring name, world-changing idea. Every tool you use today \u2014 ChatGPT, Claude, Gemini \u2014 is built on it.",
+    story:"In June 2017, eight researchers at <b>Google</b> published a paper with a cheeky title: <b>\u201cAttention Is All You Need.\u201d</b> Led by <b>Ashish Vaswani</b>, with <b>Noam Shazeer</b> and six others, they introduced the <b>Transformer</b> \u2014 a design that reads a whole sentence at once and weighs which words matter to each other, instead of crawling through one at a time. Inside Google it was almost a side project; few grasped how big it would become. Within a few years, all eight authors had left to start their own AI companies. The payoff is hiding in plain sight: the \u201cGPT\u201d in ChatGPT literally stands for Generative Pretrained <b>Transformer</b>.",
+    cast:[["Ashish Vaswani","lead author of the Transformer"],["Noam Shazeer","co-author (later Character.AI)"],["+ 6 others","all later left Google to found startups"]],
+    stats:[{n:2017,label:"\u201cAttention Is All You Need\u201d"},{n:8,label:"authors on the paper"},{text:"~100%",label:"of today\u2019s top models use it"}],
+    mk:"The paper that changed AI",
+    moment:"June 2017 \u00b7 A Google paper titled \u201cAttention Is All You Need\u201d introduces the Transformer.",
+    uses:["It\u2019s the engine under essentially every modern AI you\u2019ve heard of","Powers translation, search, and chatbots alike"],
+    pills:[["Transformer","the model design behind today\u2019s AI; reads a whole sentence at once."],["Attention","the mechanism that decides which words matter most to each other."]]
+  },
+  {
+    num:"05", name:"It starts to create", years:"2020–2022", c:"#F0C24B",
+    viz:"generating words, code, ideas",
+    eli:"Earlier AI mostly sorted things into buckets (\u201cspam / not spam\u201d). Now it can make new things \u2014 write, summarize, and code.",
+    body:"Trained on a huge slice of the internet, these models went from classifying to creating. The public earthquake was ChatGPT \u2014 the tech existed before, but suddenly anyone could just talk to it.",
+    story:"<b>OpenAI</b> scaled the Transformer up relentlessly. GPT-1 (2018) had 117 million \u201cparameters\u201d; <b>GPT-3</b> (2020) had 175 <i>billion</i>, trained on much of the public internet. Then on <b>November 30, 2022</b>, OpenAI quietly shipped <b>ChatGPT</b> as a \u201cresearch preview\u201d \u2014 something they expected to be minor. It reached 1 million users in five days and 100 million in two months, the fastest-growing consumer app in history at the time. CEO <b>Sam Altman</b> later admitted the team braced for a fraction of that. Almost overnight, your grandparent and your CEO were using the same tool.",
+    cast:[["Sam Altman","OpenAI CEO"],["Ilya Sutskever","OpenAI chief scientist (also AlexNet)"]],
+    stats:[{n:175,suf:"B",label:"GPT-3 parameters"},{n:5,suf:" days",label:"ChatGPT to 1M users"},{n:100,suf:"M",label:"users in 2 months"}],
+    mk:"AI\u2019s iPhone moment",
+    moment:"Nov 30, 2022 \u00b7 ChatGPT launches and reaches 100 million users within two months.",
+    uses:["Drafting emails and documents","Writing and debugging code","First drafts of almost anything"],
+    pills:[["Generative AI","AI that makes new content \u2014 text, images, code \u2014 rather than just sorting."],["LLM","\u201clarge language model\u201d; trained on massive text to predict and produce language."],["Parameters","the internal dials a model tunes while learning; more can mean more capability."],["Prompt","the instruction you give the model to steer what it makes."]]
+  },
+  {
+    num:"06", name:"It sees, hears & speaks together", years:"2023–2025", c:"#F09B4B",
+    viz:"one system, every sense",
+    eli:"One system that handles text, images, audio, and video together \u2014 you can show it a photo, or just talk to it out loud.",
+    body:"This is the multimodal era. The model stops being text-only and starts taking in the world more like a person does.",
+    story:"Models learned to see, hear, and speak. <b>OpenAI\u2019s GPT-4</b> (March 2023), <b>Anthropic\u2019s Claude</b>, and <b>Google\u2019s Gemini</b> could read a photo, analyze a chart, or hold a spoken conversation. In a fitting twist, in 2024 <b>Geoffrey Hinton</b> \u2014 who had quit Google in 2023 to warn the public about AI\u2019s risks \u2014 shared the <b>Nobel Prize in Physics</b> for the neural-network foundations he\u2019d laid decades earlier. In barely a year, AI moved from a curiosity to the center of the world economy.",
+    cast:[["Geoffrey Hinton","left Google 2023 to warn on AI; Nobel 2024"],["The big labs","OpenAI, Anthropic, Google in a dead heat"]],
+    stats:[{n:2023,label:"GPT-4 goes multimodal"},{n:2024,label:"Hinton wins Nobel Physics"}],
+    mk:"The everyday era",
+    moment:"2023\u20132025 \u00b7 Models become multimodal and move from novelty into daily tools for hundreds of millions.",
+    uses:["\u201cPhoto of my fridge \u2192 suggest dinner\u201d","Live spoken tutoring","Upload a chart and ask about it"],
+    pills:[["Multimodal","a model that understands more than one kind of input \u2014 text, image, audio, video."],["Token","the small chunks of text a model reads and writes; how its work is measured and priced."],["Context window","how much the model can \u201chold in mind\u201d at once \u2014 its working memory."]]
+  },
+  {
+    num:"07", name:"It stops answering and starts doing", years:"2025–2026 · now", c:"#F0664B",
+    viz:"agents delegating real work",
+    eli:"The shift happening right now: from answers to actions. Instead of telling you how to do a task, the AI does it.",
+    body:"This is agentic AI. The model breaks a goal into steps, spins up little helper \u201csub-agents,\u201d uses real tools (a browser, your files, code), and keeps going until the job is done.",
+    story:"The frontier shifted from <i>answering</i> to <i>doing</i>. In February 2026, <b>Perplexity</b> \u2014 led by 31-year-old CEO <b>Aravind Srinivas</b>, an IIT Madras grad \u2014 launched <b>Computer</b>, a system that orchestrates around 20 different AI models, handing each subtask to whichever model is best (the company\u2019s data showed no single model held even 25% of usage). Within three months it reportedly performed billions of dollars of \u201clabor-equivalent\u201d work, and Perplexity began shipping industry-specific versions \u2014 starting with <b>Computer for Counsel</b> for lawyers in June 2026. The defining question of this era isn\u2019t which single model is smartest, but who can orchestrate them all \u2014 cheaply, measured in \u201ctoken value per watt.\u201d",
+    cast:[["Aravind Srinivas","Perplexity CEO, IIT Madras"]],
+    stats:[{n:2026,label:"Perplexity launches Computer"},{n:20,suf:"+",label:"AI models orchestrated"},{n:20,pre:"$",suf:"B",label:"Perplexity valuation"}],
+    mk:"Where we are today",
+    moment:"Feb 2026 \u00b7 Perplexity launches Computer; it runs workflows for hours or days, picking the best model per subtask.",
+    uses:["Research \u2192 finished report, deck, or dashboard, hands-free","Long-running workflows that run for hours","Industry layers like Computer for Counsel (legal) \u2014 Education next?"],
+    pills:[["Agent","AI that takes actions toward a goal, not just answers a question."],["Sub-agent","a smaller helper the main agent spins up to handle one piece of the job."],["Orchestration","routing each task to whichever model or tool is best for it."]]
+  }
+];
+
+const FORCES = [
+  ["The surprise of 2026","Models are specializing, not commoditizing","There\u2019s no single \u201cbest AI.\u201d Different models win at different jobs \u2014 which is exactly why orchestration (picking the right model per task) is the bet to watch."],
+  ["The real bottleneck","Energy, not just intelligence","Running these models is hugely power-hungry. Some leaders now chase \u201ctoken value per watt\u201d \u2014 most useful work per unit of electricity. The AI race is quietly an energy race."],
+  ["The stakes","Valuations in the hundreds of billions","Anthropic and OpenAI sit near or above $850B\u2013$1T; Perplexity is valued around $20B. The agentic-AI market is projected to grow roughly 15x this decade."],
+  ["The open debate","Just scale up, or do we need new ideas?","Does AI keep getting smarter simply by going bigger (more data, more compute), or are we hitting limits that need fresh breakthroughs? Genuinely unsettled."]
+];
+
+const CARDS = [
+  ["What\u2019s the one idea behind all of AI?","Stop writing the rules yourself \u2014 let the machine figure them out. Every phase is that idea at a bigger scale."],
+  ["Who built XCON, and why did it matter?","John McDermott (CMU, 1978). Its ~2,500 rules saved DEC ~$25M/yr \u2014 proof expert systems could pay off \u2014 but its brittleness foreshadowed the AI winter."],
+  ["What killed the first neural-network wave?","Minsky & Papert\u2019s 1969 book showed the single-layer Perceptron\u2019s limits. Funding dried up for ~15 years until backpropagation revived it."],
+  ["What does the \u201cT\u201d in GPT stand for \u2014 and where\u2019s it from?","Transformer \u2014 the 2017 Google paper \u201cAttention Is All You Need,\u201d which nearly every modern AI is built on."],
+  ["What made late 2022 AI\u2019s \u201ciPhone moment\u201d?","ChatGPT \u2014 the tech existed before, but anyone could suddenly just talk to it. 100M users in two months."],
+  ["Why does Perplexity bet on \u201corchestration\u201d?","Because no single model is best at everything \u2014 so route each task to whichever one wins, and compete on token-value-per-watt."]
+];
+
+let idx=0, cardIdx=0;
+const $ = id => document.getElementById(id);
+const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+const rail=$('rail');
+PHASES.forEach((p,i)=>{
+  const el=document.createElement('div');
+  el.className='chip'; el.style.setProperty('--c',p.c);
+  el.innerHTML=`<div class="num">PHASE ${p.num}</div><div class="nm">${p.name.split(' ').slice(0,3).join(' ')}</div><div class="yr">${p.years}</div>`;
+  el.onclick=()=>select(i,true);
+  rail.appendChild(el);
+});
+
+const forces=$('forces');
+FORCES.forEach(f=>{
+  const el=document.createElement('div'); el.className='force';
+  el.innerHTML=`<div class="n">${f[0]}</div><div class="t">${f[1]}</div><div class="d">${f[2]}</div>`;
+  forces.appendChild(el);
+});
+
+function hexA(hex,a){const n=parseInt(hex.slice(1),16);return `rgba(${(n>>16)&255},${(n>>8)&255},${n&255},${a})`;}
+
+function animateNum(el,target,pre,suf,dec){
+  pre=pre||''; suf=suf||''; dec=dec||0;
+  const fin = pre + (dec? target.toFixed(dec) : target) + suf;
+  if(reduce){ el.textContent=fin; return; }
+  const dur=950, t0=performance.now();
+  (function step(now){
+    const p=Math.min(1,(now-t0)/dur), e=1-Math.pow(1-p,3), v=target*e;
+    el.textContent = pre + (dec? v.toFixed(dec) : Math.round(v)) + suf;
+    if(p<1) requestAnimationFrame(step); else el.textContent=fin;
+  })(t0);
+}
+
+function select(i, scroll){
+  idx=i; const p=PHASES[i];
+  document.documentElement.style.setProperty('--accent',p.c);
+  document.documentElement.style.setProperty('--accent-soft',hexA(p.c,0.16));
+  $('eyebrow').style.color=p.c;
+
+  const content=$('d-content');
+  content.classList.add('swap');
+
+  setTimeout(()=>{
+    $('d-num').textContent='PHASE '+p.num;
+    $('d-name').textContent=p.name;
+    $('d-years').textContent=p.years;
+    $('d-eli').textContent=p.eli;
+    $('d-body').textContent=p.body;
+    $('d-story').innerHTML=p.story;
+    $('d-mk').textContent=p.mk;
+    $('d-moment').textContent=p.moment;
+    $('vizlabel').textContent=p.viz;
+
+    const cast=$('d-cast'); cast.innerHTML='';
+    p.cast.forEach(([nm,rl])=>{
+      const d=document.createElement('div'); d.className='person';
+      d.innerHTML=`<div class="nm">${nm}</div><div class="rl">${rl}</div>`;
+      cast.appendChild(d);
+    });
+
+    const st=$('d-stats'); st.innerHTML='';
+    p.stats.forEach((s,k)=>{
+      const c=document.createElement('div'); c.className='stat'; c.style.animationDelay=(k*70)+'ms';
+      const n=document.createElement('div'); n.className='stat-n';
+      const l=document.createElement('div'); l.className='stat-l'; l.textContent=s.label;
+      c.appendChild(n); c.appendChild(l); st.appendChild(c);
+      if(s.n!==undefined) animateNum(n,s.n,s.pre,s.suf,s.dec); else n.textContent=s.text;
+    });
+
+    const u=$('d-uses'); u.innerHTML='';
+    p.uses.forEach(x=>{ const li=document.createElement('li'); li.textContent=x; u.appendChild(li); });
+
+    const pl=$('d-pills'); pl.innerHTML='';
+    p.pills.forEach(([t,d])=>{
+      const b=document.createElement('button'); b.className='pill';
+      b.innerHTML=`<span class="term">${t}</span><span class="def"> ${d}</span>`;
+      b.onclick=()=>{ b.dataset.open = b.dataset.open==='true'?'false':'true'; };
+      pl.appendChild(b);
+    });
+
+    content.classList.remove('swap');
+  }, reduce?0:200);
+
+  [...rail.children].forEach((c,ci)=>c.dataset.active=(ci===i)?'true':'false');
+  if(scroll) rail.children[i].scrollIntoView({behavior:'smooth',inline:'center',block:'nearest'});
+  $('prev').disabled=i===0; $('next').disabled=i===PHASES.length-1;
+  configureViz(i);
+}
+$('prev').onclick=()=>{ if(idx>0) select(idx-1,true); };
+$('next').onclick=()=>{ if(idx<PHASES.length-1) select(idx+1,true); };
+
+function renderCard(){
+  $('q').textContent=CARDS[cardIdx][0];
+  $('a').textContent=CARDS[cardIdx][1];
+  $('qn').textContent='Question '+(cardIdx+1);
+  $('ccount').textContent=(cardIdx+1)+' / '+CARDS.length;
+  $('card').dataset.flip='false';
+}
+$('card').onclick=()=>{ const c=$('card'); c.dataset.flip=c.dataset.flip==='true'?'false':'true'; };
+$('cprev').onclick=(e)=>{e.stopPropagation(); cardIdx=(cardIdx-1+CARDS.length)%CARDS.length; renderCard();};
+$('cnext').onclick=(e)=>{e.stopPropagation(); cardIdx=(cardIdx+1)%CARDS.length; renderCard();};
+renderCard();
+
+const io=new IntersectionObserver(es=>{es.forEach(e=>{if(e.isIntersecting){e.target.classList.add('in');io.unobserve(e.target);}});},{threshold:.12});
+document.querySelectorAll('.reveal').forEach(el=>io.observe(el));
+
+const canvas=$('net'), ctx=canvas.getContext('2d');
+let nodes=[], links=[], accent='#6E8FE0', motion=0, agentic=false, dpr=1, t=0;
+
+function resize(){
+  const r=canvas.parentElement.getBoundingClientRect();
+  dpr=Math.min(window.devicePixelRatio||1,2);
+  canvas.width=r.width*dpr; canvas.height=r.height*dpr;
+  ctx.setTransform(dpr,0,0,dpr,0,0);
+  if(nodes.length) layout(r.width,r.height);
+}
+function configureViz(i){
+  const p=PHASES[i]; accent=p.c;
+  const counts=[5,9,16,22,30,40,50]; const N=counts[i];
+  motion=i*0.16; agentic=i===6; const rigid=i===0;
+  const r=canvas.parentElement.getBoundingClientRect();
+  nodes=[]; for(let k=0;k<N;k++) nodes.push({grid:rigid,hub:false});
+  if(agentic)[0,1,2].forEach(h=>{ if(nodes[h]) nodes[h].hub=true; });
+  layout(r.width||320,r.height||230);
+  const density=0.10+i*0.06; links=[];
+  for(let a=0;a<nodes.length;a++)for(let b=a+1;b<nodes.length;b++){
+    const dx=nodes[a].x-nodes[b].x, dy=nodes[a].y-nodes[b].y, d=Math.hypot(dx,dy);
+    const reach=rigid?90:120+i*8;
+    if(d<reach && Math.random()<density+0.25) links.push([a,b,Math.random()]);
+  }
+}
+function layout(W,H){
+  const pad=30, rigid=nodes.length&&nodes[0].grid;
+  if(rigid){
+    const cols=Math.ceil(Math.sqrt(nodes.length));
+    nodes.forEach((n,k)=>{const cx=k%cols,cy=Math.floor(k/cols);
+      n.x=pad+cx*((W-2*pad)/(cols-1||1)); n.y=pad+cy*((H-2*pad)/(cols-1||1)); n.bx=n.x; n.by=n.y; n.ph=0;});
+  } else {
+    nodes.forEach(n=>{n.x=pad+Math.random()*(W-2*pad); n.y=pad+Math.random()*(H-2*pad); n.bx=n.x; n.by=n.y; n.ph=Math.random()*6.28;});
+  }
+}
+function draw(){
+  const W=canvas.width/dpr, H=canvas.height/dpr;
+  ctx.clearRect(0,0,W,H); t+=0.016;
+  nodes.forEach(n=>{ if(!reduce&&motion>0&&!n.grid){ n.x=n.bx+Math.sin(t*0.8+n.ph)*motion*9; n.y=n.by+Math.cos(t*0.7+n.ph)*motion*9; }});
+  ctx.lineWidth=1;
+  links.forEach(([a,b,seed])=>{
+    const A=nodes[a],B=nodes[b]; if(!A||!B)return;
+    const alpha=0.18+0.10*Math.sin(t+seed*6);
+    ctx.strokeStyle=hexA(accent,Math.max(0.05,alpha*0.7));
+    ctx.beginPath(); ctx.moveTo(A.x,A.y); ctx.lineTo(B.x,B.y); ctx.stroke();
+    if(!reduce&&motion>0.4){ const tp=(t*0.4+seed)%1, px=A.x+(B.x-A.x)*tp, py=A.y+(B.y-A.y)*tp;
+      ctx.fillStyle=hexA(accent,0.9); ctx.beginPath(); ctx.arc(px,py,1.6,0,7); ctx.fill(); }
+  });
+  nodes.forEach(n=>{
+    const r=n.hub?5.5:3;
+    if(n.hub){ ctx.fillStyle=hexA(accent,0.18); ctx.beginPath(); ctx.arc(n.x,n.y,12+Math.sin(t*2)*2,0,7); ctx.fill(); }
+    ctx.fillStyle=accent; ctx.beginPath(); ctx.arc(n.x,n.y,r,0,7); ctx.fill();
+    ctx.fillStyle=hexA(accent,0.25); ctx.beginPath(); ctx.arc(n.x,n.y,r+3,0,7); ctx.fill();
+  });
+  requestAnimationFrame(draw);
+}
+window.addEventListener('resize',resize);
+resize(); select(0,false); requestAnimationFrame(draw);
+</script>
+</body>
+</html>
