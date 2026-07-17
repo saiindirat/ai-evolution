@@ -126,6 +126,16 @@ details.more>summary:hover{background:var(--surface)}
 .more-body{padding:0 16px 16px;font-size:.95rem;color:var(--muted)}
 .more-body p+p{margin-top:9px}
 .more-body strong{color:var(--text)}
+/* A second, deeper level for secondary detail — keeps the first level
+   short enough to read on a phone. */
+details.nested{margin-top:12px;border:1px solid var(--line);border-radius:10px;background:var(--surface)}
+details.nested>summary{cursor:pointer;list-style:none;padding:10px 12px;min-height:44px;display:flex;align-items:center;gap:8px;font-weight:600;font-size:.88rem;color:var(--muted)}
+details.nested>summary::-webkit-details-marker{display:none}
+details.nested>summary::before{content:"+";display:inline-grid;place-items:center;width:18px;height:18px;flex:0 0 auto;border-radius:5px;border:1px solid var(--line-strong);color:var(--faint);font-weight:800;font-size:13px;line-height:1}
+details.nested[open]>summary::before{content:"−"}
+details.nested>summary:hover{color:var(--text)}
+.nested-body{padding:0 12px 12px;font-size:.9rem}
+.nested-body p+p{margin-top:8px}
 
 /* ============================================================
    5. GRAPHICS
@@ -277,12 +287,12 @@ footer.end .credit{margin-top:22px;font-size:.85rem;color:var(--faint)}
   <h2 class="sec-label" id="strip-label">Seventy years, very unevenly spread</h2>
   <div class="strip" aria-labelledby="strip-label">
     <svg viewBox="0 0 620 128" role="img" aria-labelledby="stript stripd">
-      <title id="stript">A timeline from 1950 to 2030 showing that progress was slow then sudden</title>
-      <desc id="stripd">A time axis. From 1956 to 2012 — fifty-six years — only two milestones are marked, and the stretch is labelled as slow progress with long quiet periods. From 2012 to 2026 — just fourteen years — five milestones are crowded together, covering chapters three to seven. The crowding shows how recent most progress is.</desc>
+      <title id="stript">A timeline from 1950 to 2030 showing decades of groundwork, then a run of visible breakthroughs</title>
+      <desc id="stripd">A time axis. Between 1956 and 2012 — fifty-six years — only a few milestones are marked, and the stretch is labelled as decades of foundational work. From 2012 to 2026 — fourteen years — five milestones are crowded together, covering chapters three to seven. The crowding shows how recent the most visible breakthroughs are.</desc>
       <rect x="72" y="66" width="392" height="26" rx="6" fill="rgba(156,151,196,0.10)" stroke="var(--line)" stroke-width="1"/>
       <rect x="464" y="66" width="98" height="26" rx="6" fill="rgba(255,138,110,0.20)" stroke="#FF8A6E" stroke-width="1.5"/>
       <line x1="30" y1="79" x2="590" y2="79" stroke="var(--line-strong)" stroke-width="1.5"/>
-      <text class="svg-small" x="268" y="108" text-anchor="middle">56 years · slow progress, big promises, long quiet stretches</text>
+      <text class="svg-small" x="268" y="108" text-anchor="middle">56 years · foundations being built, mostly out of sight</text>
       <text class="svg-small" x="513" y="108" text-anchor="middle" fill="#FF8A6E">14 years</text>
       <text class="svg-tiny" x="513" y="122" text-anchor="middle">chapters 3–7</text>
       <g fill="var(--accent)">
@@ -301,7 +311,7 @@ footer.end .credit{margin-top:22px;font-size:.85rem;color:var(--faint)}
       <text class="svg-tiny" x="534" y="42" text-anchor="middle">2022</text>
       <text class="svg-tiny" x="574" y="10" text-anchor="start">2026</text>
     </svg>
-    <p>The shape of this picture is the story: decades of slow, difficult work — then a rush.</p>
+    <p>Decades of foundational work — then a rapid run of breakthroughs everyone could see. The quiet years were not empty. The ideas behind chapters 3 to 7 were being invented in them.</p>
   </div>
 
   <h2 class="sec-label" id="nav-label">The seven tricks · choose a chapter</h2>
@@ -316,7 +326,7 @@ footer.end .credit{margin-top:22px;font-size:.85rem;color:var(--faint)}
       <li><button class="chip" type="button" data-target="chapter-7-actions"   style="--c:#FF8A6E"><span class="chip-n">7</span><span class="chip-w">Actions</span></button></li>
     </ol>
   </nav>
-  <p class="overlap-note">These ideas overlap. The dates show important breakthrough moments — not the exact day each idea was invented.</p>
+  <p class="overlap-note">These ideas overlap, and each one keeps being used. The dates show important breakthrough moments — not the exact beginning of each idea.</p>
   <p class="visually-hidden" id="live-region" role="status" aria-live="polite"></p>
 </div>
 
@@ -376,8 +386,10 @@ footer.end .credit{margin-top:22px;font-size:.85rem;color:var(--faint)}
     <p>People write the rules by hand. The computer checks each rule in turn. When a rule matches, it does what the rule says. When none match, nothing happens.</p></div>
 
   <div class="block moment"><p class="blabel">One real moment</p>
-    <p><span class="m-year">1980.</span> A program called XCON started helping a computer company work out which parts belonged in each customer's order. It grew to roughly <strong>2,500 hand-written rules</strong>. For that one narrow job, it did well.</p>
-    <div class="anchor-num"><span class="n">2,500</span><span class="t">If you thought up and wrote <strong>one new rule every single day</strong>, that's about <strong>seven years</strong> of writing. And you'd still be missing the bagel.</span></div>
+    <p>The bagel defeats Dot's rules. <strong>Maya and Dot are made up</strong> — but real rule-based systems ran into the same kind of trouble.</p>
+    <p style="margin-top:8px"><span class="m-year">1980.</span> A real program called <strong>XCON</strong> went to work at a computer company. Its job was not breakfast. It worked out which parts belonged in each customer's computer order — cables, connectors, all of it. It grew to around <strong>2,500 hand-written rules</strong>, and for that one narrow job it did well.</p>
+    <p style="margin-top:8px">Same lesson, no toaster: rules work until the situations start multiplying. Then someone has to write, and fix, and re-check every new one.</p>
+    <div class="anchor-num"><span class="n">2,500</span><span class="t">If you thought up and wrote <strong>one new rule every day</strong>, that's about <strong>seven years</strong> of writing. And you'd still be missing the bagel.</span></div>
   </div>
 
   <div class="block pair">
@@ -389,9 +401,16 @@ footer.end .credit{margin-top:22px;font-size:.85rem;color:var(--faint)}
     <p>What if, instead of writing every rule, we showed Dot many examples?</p></div>
 
   <details class="more"><summary>Explore the real history</summary><div class="more-body">
-    <p>The phrase <strong>“artificial intelligence”</strong> was coined at a 1956 summer workshop at Dartmouth College, organised by John McCarthy and others.</p>
-    <p>Programs built this way were called <strong>expert systems</strong>. <strong>John McDermott</strong> at Carnegie Mellon began building XCON (also called R1) in 1978 for Digital Equipment Corporation; it went into regular use in 1980 and eventually held about 2,500 rules. Reported savings vary between roughly $10M and $40M a year — a good reminder that widely repeated business numbers are often estimates.</p>
-    <p>The deeper problem was <strong>maintenance</strong>. As rules piled up, changing one could break another in ways nobody predicted. Interest and funding rose and fell several times; researchers nicknamed the quiet stretches “AI winters.” Rule-based systems never disappeared — they still run inside plenty of software today. <a href="#references">See sources ↓</a></p>
+    <p><strong>Who:</strong> John McDermott, a researcher at Carnegie Mellon University.</p>
+    <p><strong>What:</strong> He started building <strong>XCON</strong> in 1978. It went to work in 1980, choosing the right parts for computer orders.</p>
+    <p><strong>The number:</strong> it grew to about <strong>2,500 rules</strong>.</p>
+    <p><strong>Why it mattered:</strong> XCON proved that hand-written rules could do real, valuable work — and then proved how hard they are to keep up. Every new situation meant another rule, and new rules kept breaking old ones.</p>
+    <details class="nested"><summary>More details</summary><div class="nested-body">
+      <p>Programs built this way are called <strong>expert systems</strong>. The phrase “artificial intelligence” was coined earlier, at a 1956 summer workshop at Dartmouth College.</p>
+      <p>Rule counts vary between sources and grew over the years, so treat “about 2,500” as the commonly cited figure rather than a fixed fact. Reported savings vary too — roughly $10M to $40M a year, depending who you ask. Widely repeated business numbers are often estimates.</p>
+      <p>Interest and funding in AI rose and fell several times; the quiet stretches got nicknamed “AI winters.” Rule-based systems never disappeared — they still run inside plenty of software today.</p>
+    </div></details>
+    <p style="margin-top:10px"><a href="#references">See sources ↓</a></p>
   </div></details>
 
   <div class="chapter-foot"><button class="btn" type="button" data-nav="prev" disabled>← Previous</button><button class="btn" type="button" data-nav="next">Next: Examples →</button></div>
@@ -472,18 +491,24 @@ footer.end .credit{margin-top:22px;font-size:.85rem;color:var(--faint)}
   </div>
 
   <div class="block pair">
-    <div class="pair-card can"><h3><span class="badge">✓</span> What it could do</h3><p>Catch junk mail it had never seen before, because it learned the <em>pattern</em> instead of memorising the words. Rules could never do that.</p></div>
-    <div class="pair-card cant"><h3><span class="badge">✕</span> What it still got wrong</h3><p>Dot only knows what the examples showed it. Bad examples teach the wrong pattern — and Dot can't tell you it learned “grass.” It just quietly gets things wrong later.</p></div>
+    <div class="pair-card can"><h3><span class="badge">✓</span> What it could do</h3><p>Catch junk mail it had never seen before, because it learned the <em>pattern</em> instead of memorising the words. Hand-written rules struggled to do that reliably at any scale.</p></div>
+    <div class="pair-card cant"><h3><span class="badge">✕</span> What it still got wrong</h3><p>Dot only knows what the examples showed it. Bad examples teach the wrong pattern — and Dot usually can't tell you it learned “grass.” It just quietly gets things wrong later.</p></div>
   </div>
 
   <div class="bridge"><p class="blabel">Which leads to chapter 3</p>
     <p>Examples helped Dot learn simple patterns, but real pictures contained millions of tiny clues. How could Dot combine them?</p></div>
 
   <details class="more"><summary>Explore the real history</summary><div class="more-body">
-    <p>This family of methods is called <strong>machine learning</strong>. Learning from labelled examples is <strong>supervised learning</strong> — the label is the “supervision.”</p>
-    <p><strong>Yann LeCun</strong> and colleagues applied backpropagation to handwritten digit recognition at Bell Labs starting in 1989; the refined <strong>LeNet-5</strong> was published in 1998. Systems in this family were used commercially to read cheques.</p>
-    <p>The grass problem is real and has a name: <strong>spurious correlation</strong>, or more broadly <strong>bias in training data</strong>. It is not solved. It matters most when models are used to make decisions about people.</p>
-    <p>A myth worth correcting: IBM's <strong>Deep Blue</strong> beat world chess champion Garry Kasparov in 1997, and it's often told as a machine-learning story. It mostly wasn't. Deep Blue relied on custom hardware, searching enormous numbers of positions, and scoring rules hand-tuned with help from human chess masters — closer to chapter 1 than chapter 2. <a href="#references">See sources ↓</a></p>
+    <p><strong>Who:</strong> Yann LeCun and colleagues at Bell Labs.</p>
+    <p><strong>What:</strong> from 1989 they taught a system to read handwritten numbers from labelled examples. It was used to read postal codes, and later cheques.</p>
+    <p><strong>The number:</strong> the practice set of digits they helped make famous, <strong>MNIST</strong>, holds <strong>60,000</strong> labelled training images.</p>
+    <p><strong>Why it mattered:</strong> it showed a machine could learn a messy, real-world skill from examples — no rules required.</p>
+    <details class="nested"><summary>More details</summary><div class="nested-body">
+      <p>This family of methods is called <strong>machine learning</strong>. Learning from labelled examples is <strong>supervised learning</strong> — the label is the “supervision.”</p>
+      <p>The grass problem has a name: <strong>spurious correlation</strong>, or more broadly <strong>bias in training data</strong>. It is not solved. It matters most when models make decisions about people.</p>
+      <p><strong>A myth worth correcting:</strong> IBM's Deep Blue beat chess champion Garry Kasparov in 1997, and it's often told as a machine-learning story. It mostly wasn't. Deep Blue used custom hardware, searched enormous numbers of positions, and scored them with rules hand-tuned by human chess masters — closer to chapter 1 than chapter 2.</p>
+    </div></details>
+    <p style="margin-top:10px"><a href="#references">See sources ↓</a></p>
   </div></details>
 
   <div class="chapter-foot"><button class="btn" type="button" data-nav="prev">← Back: Instructions</button><button class="btn" type="button" data-nav="next">Next: Layers →</button></div>
@@ -543,7 +568,7 @@ footer.end .credit{margin-top:22px;font-size:.85rem;color:var(--faint)}
     <p class="blabel" style="color:var(--good)">Meanwhile, in the kitchen</p>
     <p>Maya fetches the bagel from chapter 1 and holds it up to the camera.</p>
     <p><em>“Bagel,”</em> says Dot.</p>
-    <p>Maya cheers. Nobody wrote a bagel rule. Nobody wrote any rule. Dot just <em>looked</em> — and after enough examples and enough layers, it knew.</p>
+    <p>Maya cheers. Nobody wrote a special rule describing exactly what a bagel looks like. Dot just <em>looked</em> — and after enough examples and enough layers, it worked it out.</p>
   </div>
 
   <div class="block"><p class="blabel">How it works</p>
@@ -564,10 +589,16 @@ footer.end .credit{margin-top:22px;font-size:.85rem;color:var(--faint)}
     <p>Dot became much better at pictures. But sentences were difficult, because words can affect other words far away.</p></div>
 
   <details class="more"><summary>Explore the real history</summary><div class="more-body">
-    <p>These layered systems are called <strong>neural networks</strong>; stacking many layers is <strong>deep learning</strong>. The “neural” name is historical — loosely inspired by biological neurons, not copies of them.</p>
-    <p><strong>Fei-Fei Li</strong> and colleagues released <strong>ImageNet</strong> in 2009 — the huge labelled dataset that made the contest possible. In 2012 <strong>Alex Krizhevsky</strong>, with Ilya Sutskever and Geoffrey Hinton at Toronto, entered AlexNet, trained on ordinary gaming graphics chips (GPUs). Its top-5 error of 15.3% beat the runner-up's ~26%.</p>
-    <p>The idea was much older than 2012 and had a bumpy road. Frank Rosenblatt's <strong>Perceptron</strong> (1958) was an early single-layer version, hyped heavily in the press. A 1969 book by Marvin Minsky and Seymour Papert set out clear limits of that design, and interest cooled for years. What eventually made deep networks practical was a mix of better training methods, far more data, and much faster chips — not one single insight.</p>
-    <p><strong>Also worth knowing:</strong> in 2016, DeepMind's AlphaGo beat top Go player Lee Sedol 4–1. It combined layered networks with game-tree search and self-play, so it isn't the same recipe as image recognition — but it convinced many people that deep learning was serious. <a href="#references">See sources ↓</a></p>
+    <p><strong>Who:</strong> Alex Krizhevsky, with Ilya Sutskever and Geoffrey Hinton, at the University of Toronto. Their entry was nicknamed <strong>AlexNet</strong>.</p>
+    <p><strong>What:</strong> in 2012 they won a photo-naming contest, using a dataset called ImageNet that Fei-Fei Li and colleagues had released in 2009.</p>
+    <p><strong>The number:</strong> a top-5 error of <strong>15.3%</strong>, against roughly 26% for the runner-up.</p>
+    <p><strong>Why it mattered:</strong> the gap was big enough that the field changed direction quickly.</p>
+    <details class="nested"><summary>More details</summary><div class="nested-body">
+      <p>These layered systems are called <strong>neural networks</strong>; stacking many layers is <strong>deep learning</strong>. The “neural” name is historical — loosely inspired by biological neurons, not copies of them.</p>
+      <p>The idea was much older than 2012 and had a bumpy road. Frank Rosenblatt's <strong>Perceptron</strong> (1958) was an early single-layer version. A 1969 book by Marvin Minsky and Seymour Papert set out clear limits of that design, and interest cooled for years. What made deep networks practical was a mix of better training methods, far more data, and much faster chips — not one single insight. AlexNet trained on ordinary gaming graphics chips (GPUs).</p>
+      <p>In 2016, DeepMind's AlphaGo beat top Go player Lee Sedol 4–1. It combined layered networks with game-tree search and self-play, so it isn't the same recipe as image recognition — but it convinced many people that deep learning was serious.</p>
+    </div></details>
+    <p style="margin-top:10px"><a href="#references">See sources ↓</a></p>
   </div></details>
 
   <div class="chapter-foot"><button class="btn" type="button" data-nav="prev">← Back: Examples</button><button class="btn" type="button" data-nav="next">Next: Attention →</button></div>
@@ -630,10 +661,16 @@ footer.end .credit{margin-top:22px;font-size:.85rem;color:var(--faint)}
     <p>Once Dot became better at connecting words, it became surprisingly good at guessing what should come next.</p></div>
 
   <details class="more"><summary>Explore the real history</summary><div class="more-body">
-    <p>The paper was <strong>“Attention Is All You Need”</strong> (Vaswani et al., 2017), with eight authors, published while they were at Google. It was aimed at machine translation; its wider influence came later.</p>
-    <p>Attention wasn't brand new in 2017 — earlier translation systems already used a version of it. The Transformer's contribution was to <strong>drop the step-by-step recurrence</strong> and lean on attention, which made training far more parallel.</p>
-    <p>The 81-pairs point is real: standard self-attention cost grows with the <strong>square</strong> of the sequence length. A great deal of research since has gone into making that cheaper, which is why context windows keep getting longer.</p>
-    <p>Transformer-style architectures dominate language models today, but avoid absolutes: other designs exist and are actively researched, and many real systems mix approaches. <a href="#references">See sources ↓</a></p>
+    <p><strong>Who:</strong> Ashish Vaswani and seven colleagues, working at Google.</p>
+    <p><strong>What:</strong> their 2017 paper “Attention Is All You Need” introduced the <strong>Transformer</strong>. It was aimed at translation; the wider influence came later.</p>
+    <p><strong>The number:</strong> <strong>eight</strong> authors on a paper that many of today's leading language models are built on.</p>
+    <p><strong>Why it mattered:</strong> it dropped the step-by-step reading and leaned on attention, so training could happen far more in parallel — which made much bigger models practical.</p>
+    <details class="nested"><summary>More details</summary><div class="nested-body">
+      <p>Attention wasn't brand new in 2017 — earlier translation systems already used a version of it. The Transformer's contribution was mainly what it left out.</p>
+      <p>The 81-pairs point is real: standard self-attention cost grows with the <strong>square</strong> of the sequence length. Much research since has gone into making that cheaper, which is why models can handle longer and longer text.</p>
+      <p>Transformer-style designs are dominant in language models today, but they aren't the only approach — other designs exist and are actively researched, and many real systems mix approaches.</p>
+    </div></details>
+    <p style="margin-top:10px"><a href="#references">See sources ↓</a></p>
   </div></details>
 
   <div class="chapter-foot"><button class="btn" type="button" data-nav="prev">← Back: Layers</button><button class="btn" type="button" data-nav="next">Next: Creation →</button></div>
@@ -651,7 +688,7 @@ footer.end .credit{margin-top:22px;font-size:.85rem;color:var(--faint)}
   <!-- WIDGET 3 — leads the chapter -->
   <div class="play" id="play3">
     <h3>Be the predictor</h3>
-    <p class="hint">Pick the word you think comes next. Then do it again. And again. That's the entire trick.</p>
+    <p class="hint">Pick the word you think comes next. Then do it again. And again.</p>
     <div class="built" id="p3built"></div>
     <div class="choices" id="p3choices" role="group" aria-label="Pick the next word"></div>
     <p class="readout" id="p3out" role="status" aria-live="polite"><span class="tag">Round 1 of 5</span>Pick a word to follow “Once upon a”.</p>
@@ -659,7 +696,7 @@ footer.end .credit{margin-top:22px;font-size:.85rem;color:var(--faint)}
   </div>
 
   <div class="block trick"><p class="blabel">Dot's new trick</p>
-    <p>That's it. That's the whole thing.</p>
+    <p>That is the core trick behind how a language model makes text.</p>
     <p>Dot has read an enormous amount of text, so it's very good at the guessing game. Guess a piece, add it, guess again. Repeat — very fast, thousands of times — and stories, summaries, answers, and computer code all come out.</p>
     <p>Dot isn't reciting a story it has stored somewhere. It's guessing what fits next, over and over.</p></div>
 
@@ -672,69 +709,52 @@ footer.end .credit{margin-top:22px;font-size:.85rem;color:var(--faint)}
     <p>Maya, curious, asks: <em>“Dot, who invented the bagel?”</em></p>
     <p style="margin-top:8px">Dot answers instantly and warmly: <em>“The bagel was invented in 1683 by a baker named Johann Kessler, to celebrate a famous horse ride.”</em></p>
     <p style="margin-top:8px">It sounds wonderful. The date is specific. The name has a ring to it. Maya nearly writes it down.</p>
-    <p style="margin-top:8px"><strong>Dot made it up.</strong> Not to trick her — Dot was doing exactly its job, assembling words that <em>fit</em>. A confident name and a precise year are what usually comes next in a sentence like that. Fitting and true are not the same thing, and Dot cannot tell the difference.</p>
+    <p style="margin-top:8px"><strong>Dot made it up.</strong> Not to trick her — Dot was doing exactly its job, assembling words that <em>fit</em>. A confident name and a precise year are what usually comes next in a sentence like that. Fitting and true are not the same thing, and Dot often cannot reliably tell the difference.</p>
   </div>
 
   <!-- The half-trick: human feedback -->
-  <div class="block trick" style="border-left-color:var(--good);background:rgba(111,215,158,0.10)">
-    <p class="blabel" style="color:var(--good)">Dot's half-trick: people teach it what “good” means</p>
-    <p>There's a step almost everyone skips, and it's the one that made any of this useful.</p>
-    <p>A pure next-word guesser is <em>not</em> a helpful assistant. Ask an untrained one “What is the capital of France?” and it may cheerfully continue with <em>“What is the capital of Spain? What is the capital of Peru?”</em> — because on the internet, questions are usually followed by more questions. It's guessing perfectly. It's just useless.</p>
-    <p>So people stepped in. Human workers wrote out good answers by hand. Then they were shown pairs of Dot's answers and asked, over and over: <strong>which of these two is better?</strong> Those judgements were used to teach Dot what a helpful answer looks like.</p>
-    <p style="margin-top:10px"><strong>Every chatbot you have ever used was shaped by people sitting at desks, patiently rating answers.</strong> That's not a footnote to the story. It's the reason chapter 5 has a chapter 6 and 7 at all.</p>
+  <div class="block moment"><p class="blabel">So: check the important ones</p>
+    <p>Dot is a wonderful first draft and a poor final word.</p>
+    <p style="margin-top:8px">For a joke or a story idea, guessing is perfect — that's the whole job. For a date, a name, a number, a medicine, or anything you're about to tell someone else, a person needs to check it. Not because Dot is careless. Because Dot is doing something other than checking.</p>
   </div>
 
-  <figure class="viz">
-    <svg viewBox="0 0 620 180" role="img" aria-labelledby="viz5t viz5d">
-      <title id="viz5t">Humans rate two answers to teach the model what a good answer looks like</title>
-      <desc id="viz5d">One question produces two draft answers, A and B. A person compares them and picks B as better. That judgement, repeated many thousands of times, trains the model toward helpful answers. The diagram is labelled "repeated tens of thousands of times, by people".</desc>
-      <rect class="svg-box" x="14" y="66" width="112" height="42" rx="9"/>
-      <text class="svg-small" x="70" y="92" text-anchor="middle">one question</text>
-      <path class="svg-arrow" d="M130 78 L162 56" marker-end="url(#a5b)"/>
-      <path class="svg-arrow" d="M130 96 L162 118" marker-end="url(#a5b)"/>
-      <rect class="svg-box" x="166" y="34" width="118" height="40" rx="9"/>
-      <text class="svg-small" x="225" y="58" text-anchor="middle">Answer A</text>
-      <rect class="svg-box" x="166" y="100" width="118" height="40" rx="9"/>
-      <text class="svg-small" x="225" y="124" text-anchor="middle">Answer B</text>
-      <path class="svg-arrow" d="M288 54 L322 76" marker-end="url(#a5b)"/>
-      <path class="svg-arrow" d="M288 120 L322 98" marker-end="url(#a5b)"/>
-      <circle cx="356" cy="87" r="26" fill="rgba(111,215,158,0.16)" stroke="#6FD79E" stroke-width="2"/>
-      <circle cx="356" cy="79" r="7" fill="none" stroke="#6FD79E" stroke-width="2"/>
-      <path d="M344 100 Q356 88 368 100" fill="none" stroke="#6FD79E" stroke-width="2"/>
-      <text class="svg-tiny" x="356" y="130" text-anchor="middle" fill="#6FD79E">a person</text>
-      <text class="svg-tiny" x="356" y="144" text-anchor="middle" fill="#6FD79E">compares</text>
-      <path class="svg-arrow" d="M386 87 L420 87" marker-end="url(#a5b)"/>
-      <rect class="svg-accent-box" x="424" y="60" width="182" height="54" rx="10" fill="rgba(111,215,158,0.12)" stroke="#6FD79E"/>
-      <text class="svg-small" x="515" y="82" text-anchor="middle" fill="var(--text)">“B is better.”</text>
-      <text class="svg-tiny" x="515" y="100" text-anchor="middle">Dot learns what good looks like</text>
-      <text class="svg-tiny" x="310" y="168" text-anchor="middle">Repeated tens of thousands of times, by people.</text>
-      <defs><marker id="a5b" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="5" markerHeight="5" orient="auto"><path d="M0 0 L10 5 L0 10 z" fill="var(--faint)"/></marker></defs>
-    </svg>
-    <figcaption>Humans are not outside the machine. They're inside the training loop.</figcaption>
-  </figure>
-
   <div class="block moment"><p class="blabel">One real moment</p>
-    <p><span class="m-year">30 November 2022.</span> OpenAI put a simple chat box in front of one of these models and called it <strong>ChatGPT</strong>. Two things made it work: the model had been taught by human raters to actually answer questions, and anyone could now just type. Reports at the time estimated it reached about <strong>100 million users in two months</strong>.</p>
-    <div class="anchor-num"><span class="n">1.3B<br><span style="font-size:.9rem">beat</span><br>175B</span><span class="t">Here's the fact that should stop you. Researchers took a model with <strong>175 billion</strong> parameters and one with <strong>1.3 billion</strong> — 100 times smaller. The small one was trained with human feedback. Human raters <strong>preferred the small one's answers</strong>.<br><br>Being 100× bigger lost to being taught by people what “good” means.</span></div>
-    <p style="margin-top:12px;font-size:.93rem;color:var(--faint)">(And for scale on “175 billion”: if you counted the parameters out loud, one per second, without ever sleeping, you'd finish in about <strong>5,500 years</strong>.)</p>
+    <p><span class="m-year">30 November 2022.</span> OpenAI put a simple chat box in front of one of these models and called it <strong>ChatGPT</strong>. The model wasn't the new part. The chat box was. Suddenly anyone could just type a question, and enormous numbers of people did, within weeks.</p>
   </div>
 
   <div class="block pair">
-    <div class="pair-card can"><h3><span class="badge">✓</span> What it could do</h3><p>Write stories, explain ideas, summarise long text, draft code, and answer questions in ordinary language — helpfully, because people taught it what helpful means.</p></div>
+    <div class="pair-card can"><h3><span class="badge">✓</span> What it could do</h3><p>Write stories, explain ideas, summarise long text, draft code, and answer questions in ordinary language.</p></div>
     <div class="pair-card cant"><h3><span class="badge">✕</span> What it still got wrong</h3><p>Sometimes Dot invents an answer that sounds confident but is not true. People call these <strong>hallucinations</strong>. Dot won't look embarrassed. It sounds exactly as sure as when it's right — ask it about bagels and see.</p></div>
   </div>
 
   <div class="bridge"><p class="blabel">Which leads to chapter 6</p>
     <p>But the world is not made only of words. It also contains pictures, voices, music, and video.</p></div>
 
+  <details class="more"><summary>Bonus trick: How people made chatbots more helpful</summary><div class="more-body">
+    <p>A pure next-word guesser is not yet a helpful assistant.</p>
+    <p>Ask an early one “What is the capital of France?” and it might continue with <em>“What is the capital of Spain? What is the capital of Peru?”</em> On the internet, questions are often followed by more questions. So it guessed perfectly — and was useless.</p>
+    <p>So people helped. Workers wrote out good answers by hand. Then they were shown two of the model's answers and asked, again and again: <strong>which one is better?</strong> Those choices were used to teach the model what a helpful answer looks like.</p>
+    <p><strong>Many modern chat assistants were shaped partly by people writing or rating answers.</strong> The method is nicknamed <strong>RLHF</strong>, which stands for reinforcement learning from human feedback.</p>
+    <div class="anchor-num" style="margin-top:14px"><span class="n">1.3B<br><span style="font-size:.85rem">beat</span><br>175B</span><span class="t">In one 2022 experiment, researchers compared a model with <strong>175 billion</strong> parameters against one with <strong>1.3 billion</strong> — about 100 times smaller. The small one had been trained with human feedback. Human raters <strong>preferred the small one's answers</strong>.<br><br>Being much bigger lost to being taught by people what “good” means.</span></div>
+    <details class="nested"><summary>More details</summary><div class="nested-body">
+      <p>The experiment above is OpenAI's <strong>InstructGPT</strong> work (Ouyang and colleagues, 2022). Labellers wrote example answers and ranked model outputs; those rankings trained a “reward model,” which was used to fine-tune the language model. OpenAI described ChatGPT as a sibling model, trained with the same method.</p>
+      <p>Human feedback reduces invented answers. It does not remove them.</p>
+      <p>Worth sitting with: the people doing this rating work are usually contractors, often paid modestly, and some review genuinely distressing material so that models won't repeat it. They rarely appear in the story.</p>
+    </div></details>
+    <p style="margin-top:10px"><a href="#references">See sources ↓</a></p>
+  </div></details>
+
   <details class="more"><summary>Explore the real history</summary><div class="more-body">
-    <p>These are <strong>large language models (LLMs)</strong>. The pieces they predict are <strong>tokens</strong> — roughly a word or part of a word. The dials adjusted while learning are <strong>parameters</strong>.</p>
-    <p>Two separate things get blurred together:</p>
-    <p><strong>1. The scaling.</strong> OpenAI's GPT-3 (2020 paper) had <strong>175 billion parameters</strong>, up from 117 million in GPT-1 (2018). Making models bigger, with more data and compute, kept improving them.</p>
-    <p><strong>2. The human feedback.</strong> The technique is <strong>RLHF</strong> — reinforcement learning from human feedback. In OpenAI's <strong>InstructGPT</strong> work (Ouyang et al., 2022), labellers wrote example answers and ranked model outputs; those rankings trained a “reward model,” which was then used to fine-tune the language model. OpenAI reported that human evaluators preferred outputs from a <strong>1.3B-parameter InstructGPT over the 175B GPT-3</strong>. OpenAI described ChatGPT as a sibling model to InstructGPT, trained with the same method.</p>
-    <p><strong>3. The interface.</strong> ChatGPT launched 30 November 2022 as a “research preview.” The “100 million users in two months” figure comes from a UBS estimate reported by Reuters in February 2023 — an outside estimate, not an audited company number.</p>
-    <p>Hallucination isn't a bug someone forgot to fix. It follows from how the system works: it is built to produce likely text, and likely text is usually — but not always — true. RLHF reduces it. It does not remove it.</p>
-    <p>Worth sitting with: the people who do this rating work are usually contractors, often paid modestly, and some review genuinely distressing material so that models won't repeat it. They rarely appear in the story. <a href="#references">See sources ↓</a></p>
+    <p><strong>Who:</strong> researchers at OpenAI, building on the Transformer from chapter 4.</p>
+    <p><strong>What:</strong> <strong>ChatGPT</strong> launched on 30 November 2022 as a “research preview.”</p>
+    <p><strong>The number:</strong> reports at the time estimated about <strong>100 million users within two months</strong>. That came from an outside estimate, not an audited company figure.</p>
+    <p><strong>Why it mattered:</strong> the models existed already. The chat box is what let everyone else in.</p>
+    <details class="nested"><summary>More details</summary><div class="nested-body">
+      <p>These are <strong>large language models</strong>, or LLMs. The pieces they predict are called <strong>tokens</strong> — roughly a word or part of a word. The dials adjusted while learning are <strong>parameters</strong>.</p>
+      <p>OpenAI's GPT-3 (2020) had <strong>175 billion</strong> parameters, up from 117 million in GPT-1 (2018). Making models bigger, with more data and computing power, kept improving them. For scale: counting 175 billion out loud, one per second, would take roughly 5,500 years.</p>
+      <p>Invented answers are nicknamed <strong>hallucinations</strong>. This isn't a bug someone forgot to fix. It follows from how the system works: it is built to produce likely text, and likely text is usually — but not always — true.</p>
+    </div></details>
+    <p style="margin-top:10px"><a href="#references">See sources ↓</a></p>
   </div></details>
 
   <div class="chapter-foot"><button class="btn" type="button" data-nav="prev">← Back: Attention</button><button class="btn" type="button" data-nav="next">Next: Many senses →</button></div>
@@ -750,7 +770,8 @@ footer.end .credit{margin-top:22px;font-size:.85rem;color:var(--faint)}
 
   <div class="block trick"><p class="blabel">Dot's new trick</p>
     <p>Maya holds up her phone, takes a photo of the drooping yellow leaves, and just asks out loud: <em>“What's wrong with my plant?”</em></p>
-    <p>Dot takes in all three at once — the picture, her spoken question, and what it has read about plants — and answers: the leaves are yellow near the bottom and the soil looks wet, so this might be too much water.</p></div>
+    <p>Dot takes in two things right now: <strong>the picture</strong> and <strong>her spoken question</strong>. It combines them with <strong>patterns it learned earlier</strong> about plants, from long before today.</p>
+    <p>Then it answers: the leaves are yellow near the bottom and the soil looks wet, so this might be too much water.</p></div>
 
   <figure class="viz">
     <svg viewBox="0 0 620 200" role="img" aria-labelledby="viz6t viz6d">
@@ -791,7 +812,8 @@ footer.end .credit{margin-top:22px;font-size:.85rem;color:var(--faint)}
   </figure>
 
   <div class="block"><p class="blabel">How it works</p>
-    <p>A <strong>multimodal</strong> model can take in combinations of text, images, audio, and video. Each kind of input gets turned into numbers, and the model works with those patterns together.</p>
+    <p><strong>Multimodal</strong> means combining more than one kind of information — such as text, pictures, sound, or video.</p>
+    <p>Each kind of input gets turned into numbers. The model then works with those together, alongside the patterns it learned during training.</p>
     <p>Be careful with the word “senses.” Dot does not see the plant or hear Maya the way you do. It converts a photo and a sound into patterns, and finds connections between them.</p></div>
 
   <div class="block moment"><p class="blabel">One real moment</p>
@@ -808,9 +830,16 @@ footer.end .credit{margin-top:22px;font-size:.85rem;color:var(--faint)}
     <p>Dot could understand and create many kinds of information, but it still waited for Maya to give every instruction.</p></div>
 
   <details class="more"><summary>Explore the real history</summary><div class="more-body">
-    <p>The word is <strong>multimodal</strong> — each “mode” is a kind of input: text, image, audio, video. Turning an input into a list of numbers the model can use is called creating an <strong>embedding</strong>.</p>
-    <p>GPT-4 was announced in March 2023 and accepted image and text inputs, returning text. Other labs shipped models with overlapping abilities around the same period; the timing is genuinely close, and “who was first” depends on which specific ability you count.</p>
-    <p><strong>A separate note:</strong> in 2024, Geoffrey Hinton and John Hopfield shared the Nobel Prize in Physics for foundational work on machine learning with artificial neural networks — the ideas behind chapter 3, honoured decades later. A nice bit of history, but not part of the multimodal story. <a href="#references">See sources ↓</a></p>
+    <p><strong>Who:</strong> OpenAI, along with several other labs working on the same idea at the same time.</p>
+    <p><strong>What:</strong> <strong>GPT-4</strong>, announced in March 2023, accepted both images and text as input and replied in text.</p>
+    <p><strong>The number:</strong> <strong>two</strong> kinds of input at once — which sounds small, and changed what people could ask for.</p>
+    <p><strong>Why it mattered:</strong> you could finally point at something instead of describing it.</p>
+    <details class="nested"><summary>More details</summary><div class="nested-body">
+      <p>Each “mode” is a kind of input: text, image, audio, video. Turning an input into a list of numbers the model can use is called making an <strong>embedding</strong>.</p>
+      <p>Several labs shipped models with overlapping abilities around the same period. The timing is genuinely close, and “who was first” depends on which specific ability you count.</p>
+      <p><strong>A separate note:</strong> in 2024, Geoffrey Hinton and John Hopfield shared the Nobel Prize in Physics for foundational work on machine learning with artificial neural networks — the ideas behind chapter 3, honoured decades later. A nice bit of history, but not part of the multimodal story.</p>
+    </div></details>
+    <p style="margin-top:10px"><a href="#references">See sources ↓</a></p>
   </div></details>
 
   <div class="chapter-foot"><button class="btn" type="button" data-nav="prev">← Back: Creation</button><button class="btn" type="button" data-nav="next">Next: Actions →</button></div>
@@ -849,22 +878,29 @@ footer.end .credit{margin-top:22px;font-size:.85rem;color:var(--faint)}
       <rect x="404" y="42" width="106" height="76" rx="10" fill="rgba(255,138,110,0.18)" stroke="#FF8A6E" stroke-width="2.5"/>
       <text class="svg-tiny" x="457" y="34" text-anchor="middle" fill="#FF8A6E">4 · MAYA APPROVES</text>
       <text class="svg-small" x="457" y="66" text-anchor="middle" fill="var(--text)">“Shall I</text><text class="svg-small" x="457" y="82" text-anchor="middle" fill="var(--text)">send this?”</text>
-      <text class="svg-tiny" x="457" y="104" text-anchor="middle" fill="#FF8A6E">required</text>
+      <text class="svg-tiny" x="457" y="104" text-anchor="middle" fill="#FF8A6E">for big actions</text>
       <path class="svg-arrow" d="M514 80 L538 80" marker-end="url(#a7)"/>
       <rect class="svg-box" x="542" y="52" width="68" height="56" rx="10"/>
       <text class="svg-tiny" x="576" y="44" text-anchor="middle">5 · RESULT</text>
       <text class="svg-small" x="576" y="86" text-anchor="middle">done</text>
-      <text class="svg-tiny" x="310" y="160" text-anchor="middle">A person decides before anything gets sent, bought, or deleted.</text>
+      <text class="svg-tiny" x="310" y="160" text-anchor="middle">For big actions — sending, buying, sharing, deleting — a person should decide.</text>
       <text class="svg-tiny" x="310" y="178" text-anchor="middle">Dot can still misunderstand the goal, get stuck, or use a tool wrongly.</text>
       <defs><marker id="a7" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="5" markerHeight="5" orient="auto"><path d="M0 0 L10 5 L0 10 z" fill="var(--faint)"/></marker></defs>
     </svg>
-    <figcaption>Goal → plan → tools → human approval → result. The fourth step is not optional.</figcaption>
+    <figcaption>Goal → plan → tools → human approval → result.</figcaption>
   </figure>
 
   <div class="block"><p class="blabel">How it works</p>
     <p>An <strong>agent</strong> is a model connected to a plan, a memory, and tools. The model decides what to do next. The tools — a weather service, a map, a calendar — let it actually do things.</p>
     <p>The memory matters: it's how Dot remembers, at step four, what it found at step one.</p>
-    <p class="callback"><strong>Notice what's underneath.</strong> Dot needed <em>every</em> earlier trick for this. Rules to follow a plan. Examples and layers to read a map. Attention and prediction to write the invitation. Many senses to check the sky. Seven tricks, all working at once, to organise one picnic.</p></div>
+    <p class="callback"><strong>Notice what's underneath.</strong> Dot needed the earlier tricks for this. Rules to follow a plan. Examples and layers to read a map. Attention and prediction to write the invitation. Many senses to check the sky. Seven tricks, working together, to organise one picnic.</p></div>
+
+  <div class="block moment" style="border-color:#FF8A6E;border-style:solid">
+    <p class="blabel" style="color:#FF8A6E">Which steps need a person?</p>
+    <p>Not every step. Checking the weather is harmless — if Dot gets it wrong, you look at the sky. Small, easily undone actions can happen on their own, and often do.</p>
+    <p style="margin-top:8px">But some actions are hard to take back. <strong>For important actions — sending, buying, sharing, publishing, or deleting — human approval should not be optional.</strong> Once the invitation reaches 25 families, it has reached them.</p>
+    <p style="margin-top:8px;font-size:.93rem;color:var(--faint)">This is a rule about how agents <em>should</em> be built, not a promise about how every agent works today. Different products draw the line in different places, and some draw it badly. It's worth knowing where a tool draws it before you let it act for you.</p>
+  </div>
 
   <div class="block moment"><p class="blabel">Examples in 2026 <span class="asof">as of 17 July 2026</span></p>
     <p>Several companies now sell agents of this kind, and no one of them is the finish line. OpenAI, Anthropic, Google, and Perplexity all ship agent products. As one dated example: Perplexity launched a product called <strong>Computer</strong> on <strong>25 February 2026</strong>, which routes different parts of a task to different AI models — reported at launch as 19 of them.</p>
@@ -879,10 +915,16 @@ footer.end .credit{margin-top:22px;font-size:.85rem;color:var(--faint)}
     <p>Dot has seven tricks now. So who decides what Dot should do — and who checks whether it got it right?</p></div>
 
   <details class="more"><summary>Explore the real history</summary><div class="more-body">
-    <p>Giving a model tools is often called <strong>tool use</strong> or <strong>function calling</strong>. Letting it plan its own steps toward a goal makes it an <strong>agent</strong>. Some agents split work among smaller helpers, called <strong>sub-agents</strong>. Sending each part of a job to whichever model handles it best is <strong>orchestration</strong>.</p>
-    <p><strong>Dated product facts (17 July 2026):</strong> Perplexity launched Computer on 25 February 2026; press coverage at launch described it as orchestrating 19 AI models. A version for legal teams, Computer for Counsel, was announced 24 June 2026 and described as drawing on more than 20 models. These are launch facts reported by the press.</p>
-    <p><strong>Company claims vs. independent findings.</strong> Claims about how much work an agent replaces usually come from the companies selling them, and independent testing of agents is still early. Treat performance claims as claims until someone outside the company checks them.</p>
-    <p><strong>An open question from whoever built this page:</strong> if agents are being tailored for particular jobs — legal work was among the first — education seems like an interesting candidate. That's a personal hunch, not a prediction, and definitely not a fact. <a href="#references">See sources ↓</a></p>
+    <p><strong>Who:</strong> lots of companies at once — OpenAI, Anthropic, Google, Perplexity and others.</p>
+    <p><strong>What:</strong> as one dated example, Perplexity launched a product called <strong>Computer</strong> on 25 February 2026.</p>
+    <p><strong>The number:</strong> press coverage at launch described it as sending different parts of a task to <strong>19</strong> different AI models.</p>
+    <p><strong>Why it mattered:</strong> it's a sign of where this is heading — not one model doing everything, but a manager handing each job to whichever helper suits it.</p>
+    <details class="nested"><summary>More details</summary><div class="nested-body">
+      <p>Giving a model tools is often called <strong>tool use</strong> or <strong>function calling</strong>. Letting it plan its own steps makes it an <strong>agent</strong>. Some agents split work among smaller helpers, called <strong>sub-agents</strong>. Sending each part of a job to whichever model handles it best is <strong>orchestration</strong>.</p>
+      <p><strong>Company claims vs. independent findings.</strong> Claims about how much work an agent replaces usually come from the companies selling them, and independent testing of agents is still early. Treat performance claims as claims until someone outside the company checks them.</p>
+      <p><strong>An open question from whoever built this page:</strong> if agents are being tailored for particular jobs — legal work was among the first — education seems like an interesting candidate. That's a personal hunch, not a prediction, and definitely not a fact.</p>
+    </div></details>
+    <p style="margin-top:10px"><a href="#references">See sources ↓</a></p>
   </div></details>
 
   <div class="chapter-foot"><button class="btn" type="button" data-nav="prev">← Back: Many senses</button><button class="btn" type="button" data-nav="next" disabled>End of the story</button></div>
@@ -892,7 +934,7 @@ footer.end .credit{margin-top:22px;font-size:.85rem;color:var(--faint)}
 <section class="chapter" id="where-things-stand" aria-labelledby="h-stand">
   <div class="chapter-head"><span class="chapter-num">After the story</span></div>
   <h2 id="h-stand">Where things stand</h2>
-  <p style="color:var(--muted);max-width:62ch;margin-bottom:18px">Seven tricks in, here's an honest picture of what Dot — and every real AI system — can and can't do.</p>
+  <p style="color:var(--muted);max-width:62ch;margin-bottom:18px">Seven tricks in, here's an honest picture of what today's AI systems can and can't do.</p>
   <div class="grid2">
     <div class="stand-card"><h3>What AI is good at</h3><ul>
       <li>Spotting patterns in huge piles of data</li><li>Producing a first draft of almost anything</li>
@@ -904,7 +946,7 @@ footer.end .credit{margin-top:22px;font-size:.85rem;color:var(--faint)}
       <li>Failing in ways that surprise its own builders</li></ul></div>
     <div class="stand-card"><h3>Why humans still matter</h3><ul>
       <li>People choose the goal — Dot never picks the picnic</li>
-      <li>People check the work, because Dot can't tell when it's wrong</li>
+      <li>People check the work, because Dot often cannot reliably tell when it is wrong</li>
       <li>People taught it what “good” means in the first place</li>
       <li>People carry responsibility when something goes badly</li>
       <li>People decide what <em>shouldn't</em> be built at all</li></ul></div>
@@ -925,8 +967,8 @@ footer.end .credit{margin-top:22px;font-size:.85rem;color:var(--faint)}
 <!-- ======================= QUIZ ======================= -->
 <section class="chapter" id="quiz" aria-labelledby="h-quiz">
   <div class="chapter-head"><span class="chapter-num">Check yourself</span></div>
-  <h2 id="h-quiz">Seven questions</h2>
-  <p style="color:var(--muted);max-width:62ch;margin-bottom:18px">No names, no dates, no numbers. These ask whether the <em>ideas</em> landed. Pick an answer to see why.</p>
+  <h2 id="h-quiz">Seven questions, plus a bonus</h2>
+  <p style="color:var(--muted);max-width:62ch;margin-bottom:18px">One question per chapter. No names, no dates, no numbers — these ask whether the <em>ideas</em> landed. Pick an answer to see why.</p>
 
   <div class="quiz-item"><p class="quiz-q"><span class="qn">1.</span> Why did one bagel defeat a program with 2,500 carefully written rules?</p>
     <div class="quiz-opts">
@@ -968,13 +1010,14 @@ footer.end .credit{margin-top:22px;font-size:.85rem;color:var(--faint)}
     </div>
     <p class="quiz-fb" hidden>This is the big one — remember Johann Kessler and his bagel. The model builds text one likely piece at a time. It isn't checking a fact, it's producing a plausible continuation. Usually plausible and true match. Sometimes they don't, and it sounds just as confident either way.</p></div>
 
-  <div class="quiz-item"><p class="quiz-q"><span class="qn">6.</span> A model 100 times smaller gave answers people preferred. What made the difference?</p>
+  <div class="quiz-item"><p class="quiz-q"><span class="qn">6.</span> Maya shows Dot a picture and asks a spoken question. What makes this multimodal?</p>
     <div class="quiz-opts">
-      <button class="opt" type="button" data-correct="false">It was newer, so it had fresher facts</button>
-      <button class="opt" type="button" data-correct="true">People rated its answers and taught it what a helpful answer looks like</button>
-      <button class="opt" type="button" data-correct="false">It ran on faster computers</button>
+      <button class="opt" type="button" data-correct="false">Dot is using more electricity</button>
+      <button class="opt" type="button" data-correct="true">Dot is combining more than one kind of input</button>
+      <button class="opt" type="button" data-correct="false">Dot is completing several tasks at once</button>
+      <button class="opt" type="button" data-correct="false">Dot is connected to the internet</button>
     </div>
-    <p class="quiz-fb" hidden>Human feedback beat being 100× bigger. Every chatbot you've used was shaped by people patiently comparing answers and saying which was better. Humans aren't outside the machine — they're inside the training loop.</p></div>
+    <p class="quiz-fb" hidden>Multimodal AI works with different kinds of information, such as pictures, speech, text, and video. Here it's a picture plus a spoken question, together. Remember: that isn't seeing and hearing the way you do — each input becomes patterns first.</p></div>
 
   <div class="quiz-item"><p class="quiz-q"><span class="qn">7.</span> Dot has drafted an invitation. Why should it ask Maya before sending it?</p>
     <div class="quiz-opts">
@@ -983,6 +1026,14 @@ footer.end .credit{margin-top:22px;font-size:.85rem;color:var(--faint)}
       <button class="opt" type="button" data-correct="false">Because sending emails is too hard for Dot</button>
     </div>
     <p class="quiz-fb" hidden>Once an agent can act, its mistakes stop being just words on a screen. Sending, buying, and deleting are hard to undo — so a person checks first. Maya chose the picnic, and Maya decides what goes out.</p></div>
+
+  <div class="quiz-item" style="border-color:var(--line-strong);border-style:dashed"><p class="quiz-q"><span class="qn">Bonus.</span> A model 100 times smaller gave answers people preferred. What made the difference? <span style="font-weight:400;color:var(--faint);font-size:.9rem">(from the bonus trick in chapter 5)</span></p>
+    <div class="quiz-opts">
+      <button class="opt" type="button" data-correct="false">It was newer, so it had fresher facts</button>
+      <button class="opt" type="button" data-correct="true">People rated its answers and taught it what a helpful answer looks like</button>
+      <button class="opt" type="button" data-correct="false">It ran on faster computers</button>
+    </div>
+    <p class="quiz-fb" hidden>Human feedback beat being 100 times bigger. Many chat assistants were shaped partly by people comparing two answers and picking the better one — which means people are inside the training, not just outside using the result.</p></div>
 </section>
 
 <!-- ======================= REFERENCES ======================= -->
@@ -1307,11 +1358,11 @@ footer.end .credit{margin-top:22px;font-size:.85rem;color:var(--faint)}
     } else {
       var s = 'Once upon a ' + p3.words.join(' ');
       p3out.className = 'readout ok';
-      p3out.innerHTML = '<span class="tag">That was the whole trick</span>' +
+      p3out.innerHTML = '<span class="tag">That was the core trick</span>' +
         'You wrote: <strong>“' + s + '.”</strong><br><br>' +
         'You never planned that sentence. You just picked a likely next word, five times, and a sentence appeared. ' +
-        '<strong>That is exactly what a language model does</strong> — except it does it thousands of times a second, having read more text than you could finish in a thousand lifetimes.<br><br>' +
-        'And here\'s the part to hold on to: <strong>at no point did you check whether any of it was true.</strong> Neither does it.';
+        '<strong>That is the core trick a language model uses</strong> — except it does it thousands of times a second, having read far more text than a person could read in a lifetime.<br><br>' +
+        'And here\'s the part to hold on to: <strong>at no point did you check whether any of it was true.</strong> The model isn\'t checking either.';
     }
   });
   document.getElementById('p3reset').addEventListener('click', function () {
