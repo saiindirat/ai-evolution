@@ -1,533 +1,1336 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" class="no-js">
 <head>
 <meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>How Machines Learned to Think</title>
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>The Bagel That Broke the Robot — How AI Learned Seven New Tricks</title>
+<meta name="description" content="A bagel once defeated a machine with 2,500 rules. An illustrated story of how AI learned seven new tricks — instructions, examples, layers, attention, creation, many senses, and tools — and what it still gets wrong. Written so a curious 10-year-old can follow it." />
+<meta name="color-scheme" content="dark light" />
+
+<!-- Link previews (when the page is shared in chat, social, or messages) -->
+<meta property="og:type" content="article" />
+<meta property="og:title" content="The Bagel That Broke the Robot" />
+<meta property="og:description" content="How AI learned seven new tricks — and what it still gets wrong. An illustrated story for curious people of any age." />
+<meta name="twitter:card" content="summary_large_image" />
+<meta name="twitter:title" content="The Bagel That Broke the Robot" />
+<meta name="twitter:description" content="How AI learned seven new tricks — and what it still gets wrong." />
+<script>document.documentElement.classList.replace('no-js','js');</script>
 <link rel="preconnect" href="https://fonts.googleapis.com" />
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,400;12..96,600;12..96,800&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet" />
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
+
 <style>
-  :root{
-    --ink:#14122B; --ink-2:#1C1940; --surface:#211D47; --surface-2:#2A2557;
-    --line:rgba(170,160,230,0.16); --line-strong:rgba(170,160,230,0.30);
-    --text:#ECEAF8; --muted:#A09CC4; --faint:#726E9A;
-    --accent:#6E8FE0; --accent-soft:rgba(110,143,224,0.16);
-  }
-  *{box-sizing:border-box;margin:0;padding:0}
-  html{scroll-behavior:smooth}
-  body{
-    background:
-      radial-gradient(1200px 700px at 80% -10%, rgba(110,143,224,0.10), transparent 60%),
-      radial-gradient(900px 600px at -10% 30%, rgba(240,102,75,0.06), transparent 55%),
-      var(--ink);
-    color:var(--text); font-family:'Inter',system-ui,sans-serif; line-height:1.55;
-    -webkit-font-smoothing:antialiased; overflow-x:hidden;
-  }
-  .wrap{max-width:920px;margin:0 auto;padding:0 20px}
+/* ============================================================
+   1. TOKENS
+   ============================================================ */
+:root{
+  --ink:#14122B; --ink-2:#1D1A42; --surface:#252152; --surface-2:#2E2A61;
+  --line:rgba(178,170,235,0.22); --line-strong:rgba(178,170,235,0.42);
+  --text:#F2F0FC; --muted:#C5C1E4; --faint:#9C97C4;
+  --accent:#8FA8EC; --accent-soft:rgba(143,168,236,0.16);
+  --good:#6FD79E; --bad:#FF9A85; --grass:#6FD79E;
+  --radius:16px;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}
+body{
+  background:
+    radial-gradient(1100px 640px at 82% -8%, rgba(143,168,236,0.10), transparent 60%),
+    radial-gradient(820px 560px at -8% 26%, rgba(255,138,110,0.055), transparent 55%),
+    var(--ink);
+  color:var(--text); font-family:'Inter',system-ui,-apple-system,sans-serif;
+  font-size:17px; line-height:1.65; -webkit-font-smoothing:antialiased; overflow-x:hidden;
+}
+.wrap{max-width:860px;margin:0 auto;padding:0 20px}
+:focus-visible{outline:3px solid var(--accent);outline-offset:3px;border-radius:6px}
+.skip{position:absolute;left:-9999px;top:0;z-index:99;background:var(--accent);color:#12102A;font-weight:700;padding:12px 18px;border-radius:0 0 10px 0}
+.skip:focus{left:0}
+.visually-hidden{position:absolute !important;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap;border:0}
 
-  /* HERO */
-  header{padding:60px 0 26px}
-  .eyebrow{font-family:'JetBrains Mono',monospace;font-size:12px;letter-spacing:0.28em;text-transform:uppercase;color:var(--accent);transition:color .6s ease}
-  h1{font-family:'Bricolage Grotesque',sans-serif;font-weight:800;font-size:clamp(2.4rem,8vw,4.4rem);line-height:0.98;letter-spacing:-0.02em;margin:14px 0 12px}
-  h1 .glow{background:linear-gradient(100deg,#6E8FE0,#5BD49B 40%,#F0C24B 70%,#F0664B);-webkit-background-clip:text;background-clip:text;color:transparent}
-  .pulse-line{height:2px;width:100%;margin:6px 0 18px;background:linear-gradient(90deg,transparent,var(--accent),transparent);background-size:220% 100%;animation:slide 3.4s linear infinite;opacity:.7;transition:background .6s}
-  @keyframes slide{0%{background-position:120% 0}100%{background-position:-120% 0}}
-  .lede{font-size:clamp(1rem,2.4vw,1.18rem);color:var(--muted);max-width:62ch}
-  .ribbon{display:flex;flex-wrap:wrap;gap:8px;margin-top:24px;align-items:center;font-family:'JetBrains Mono',monospace;font-size:12.5px}
-  .ribbon span{padding:5px 11px;border:1px solid var(--line);border-radius:999px;color:var(--muted)}
-  .ribbon b{color:var(--faint);font-weight:400}
+/* ============================================================
+   2. HERO
+   ============================================================ */
+header.hero{padding:56px 0 28px}
+.eyebrow{font-size:13px;font-weight:600;letter-spacing:.18em;text-transform:uppercase;color:var(--accent)}
+h1{font-family:'Bricolage Grotesque',sans-serif;font-weight:800;font-size:clamp(2.3rem,7.5vw,4rem);line-height:1.02;letter-spacing:-.02em;margin:14px 0}
+h1 .glow{background:linear-gradient(100deg,#8FA8EC,#6FD79E 42%,#F5CE63 70%,#FF8A6E);-webkit-background-clip:text;background-clip:text;color:transparent}
+.lede{font-size:clamp(1.05rem,2.4vw,1.22rem);color:var(--muted);max-width:60ch}
+.note-card{margin-top:20px;padding:14px 16px;border:1px solid var(--line);border-left:3px solid var(--accent);border-radius:0 12px 12px 0;background:var(--accent-soft);font-size:.97rem;max-width:62ch}
 
-  section{padding:32px 0;border-top:1px solid var(--line)}
-  .sec-label{font-family:'JetBrains Mono',monospace;font-size:11.5px;letter-spacing:0.24em;text-transform:uppercase;color:var(--faint);margin-bottom:16px}
+/* ============================================================
+   3. TIMELINE STRIP + NAV
+   ============================================================ */
+.nav-shell{padding:26px 0 8px;border-top:1px solid var(--line)}
+.sec-label{font-size:13px;font-weight:600;letter-spacing:.16em;text-transform:uppercase;color:var(--faint);margin-bottom:14px}
+.strip{border:1px solid var(--line);border-radius:var(--radius);background:var(--ink-2);padding:14px 12px 8px;margin-bottom:22px}
+.strip svg{display:block;width:100%;height:auto}
+.strip p{font-size:.88rem;color:var(--faint);text-align:center;margin-top:6px}
+.chapter-nav ol{list-style:none;display:flex;flex-wrap:wrap;gap:8px}
+.chapter-nav li{display:contents}
+.chip{display:flex;flex-direction:column;gap:2px;align-items:flex-start;min-height:52px;padding:9px 14px;cursor:pointer;background:var(--ink-2);border:1px solid var(--line);border-radius:12px;color:var(--text);font-family:inherit;font-size:15px;text-align:left;transition:border-color .2s,background .2s,transform .2s}
+.chip:hover{transform:translateY(-2px);border-color:var(--c)}
+.chip .chip-n{font-size:12px;font-weight:700;color:var(--c);letter-spacing:.06em}
+.chip .chip-w{font-weight:600}
+.chip[aria-current="true"]{background:var(--surface);border-color:var(--c);box-shadow:inset 0 0 0 1px var(--c)}
+.chip[aria-current="true"] .chip-w::before{content:"▸ ";color:var(--c)}
+.overlap-note{margin-top:14px;font-size:.93rem;color:var(--faint);max-width:60ch}
 
-  /* TIMELINE RAIL */
-  .rail{display:flex;gap:10px;overflow-x:auto;padding:4px 2px 14px;scroll-snap-type:x mandatory;-webkit-overflow-scrolling:touch}
-  .rail::-webkit-scrollbar{height:6px}
-  .rail::-webkit-scrollbar-thumb{background:var(--line-strong);border-radius:999px}
-  .chip{flex:0 0 auto;scroll-snap-align:start;cursor:pointer;background:var(--ink-2);border:1px solid var(--line);border-radius:14px;padding:12px 15px;min-width:138px;transition:border-color .25s,transform .25s,background .25s}
-  .chip:hover{transform:translateY(-2px)}
-  .chip .num{font-family:'JetBrains Mono',monospace;font-size:12px;color:var(--c)}
-  .chip .nm{font-family:'Bricolage Grotesque',sans-serif;font-weight:600;font-size:15px;margin-top:3px}
-  .chip .yr{font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--faint);margin-top:2px}
-  .chip[data-active="true"]{background:var(--surface);border-color:var(--c);box-shadow:0 0 0 1px var(--c) inset}
+/* ============================================================
+   4. CHAPTERS
+   ============================================================ */
+.chapter{padding:30px 0 10px;border-top:1px solid var(--line)}
+.js .chapter[hidden]{display:none}
+.no-js .chapter[hidden]{display:block}
+.chapter-head{display:flex;align-items:baseline;gap:12px;flex-wrap:wrap;margin-bottom:6px}
+.chapter-num{font-size:13px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:var(--accent)}
+.chapter-idea{font-size:12px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--text);background:var(--accent-soft);border:1px solid var(--accent);padding:3px 9px;border-radius:999px}
+.chapter h2{font-family:'Bricolage Grotesque',sans-serif;font-weight:800;font-size:clamp(1.6rem,4.6vw,2.15rem);line-height:1.1;letter-spacing:-.01em;margin:6px 0 2px}
+.chapter h2:focus{outline:none}
+.chapter h2:focus-visible{outline:3px solid var(--accent);outline-offset:4px}
+.chapter-date{font-size:14px;color:var(--faint);font-weight:500}
+.block{margin-top:22px}
+.blabel{font-size:12px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:var(--faint);margin-bottom:8px}
+.block p{max-width:64ch}
+.block p+p{margin-top:10px}
+.trick{padding:16px 18px;border:1px solid var(--line);border-left:3px solid var(--accent);border-radius:0 12px 12px 0;background:var(--accent-soft)}
+.trick .blabel{color:var(--accent)}
+.moment{padding:14px 16px;border:1px dashed var(--line-strong);border-radius:12px;background:var(--ink-2)}
+.moment .m-year{font-weight:700;color:var(--accent)}
+/* Recurring-thread callback */
+.callback{margin-top:14px;padding:11px 14px 11px 40px;position:relative;border-radius:10px;background:var(--surface);border:1px solid var(--line);font-size:.94rem;color:var(--muted);max-width:64ch}
+.callback::before{content:"↩";position:absolute;left:14px;top:9px;font-size:16px;color:var(--accent);font-weight:700}
+.callback strong{color:var(--text)}
+/* The "big number" anchor */
+.anchor-num{margin-top:14px;display:flex;gap:14px;align-items:center;padding:13px 16px;border-radius:12px;background:linear-gradient(135deg,var(--surface),var(--ink-2));border:1px solid var(--line-strong)}
+.anchor-num .n{font-family:'Bricolage Grotesque',sans-serif;font-weight:800;font-size:1.7rem;color:var(--accent);line-height:1;flex:0 0 auto}
+.anchor-num .t{font-size:.93rem;color:var(--muted)}
+.anchor-num .t strong{color:var(--text)}
+.pair{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+@media(max-width:620px){.pair{grid-template-columns:1fr}}
+.pair-card{padding:14px 16px;border:1px solid var(--line);border-radius:12px;background:var(--ink-2)}
+.pair-card h3{font-size:14px;font-weight:700;margin-bottom:7px;display:flex;align-items:center;gap:7px;letter-spacing:.02em}
+.pair-card.can h3{color:var(--good)} .pair-card.cant h3{color:var(--bad)}
+.pair-card .badge{display:inline-grid;place-items:center;width:20px;height:20px;border-radius:50%;font-size:12px;font-weight:800;flex:0 0 auto}
+.pair-card.can .badge{background:var(--good);color:#0C2A1C}
+.pair-card.cant .badge{background:var(--bad);color:#3A1108}
+.pair-card p{font-size:.95rem;color:var(--muted)}
+.bridge{margin-top:22px;padding:16px 18px;border-radius:12px;background:linear-gradient(135deg,var(--surface),var(--ink-2));border:1px solid var(--line-strong)}
+.bridge .blabel{color:var(--accent);margin-bottom:6px}
+.bridge p{font-size:1.06rem;font-weight:500;max-width:58ch}
+details.more{margin-top:20px;border:1px solid var(--line);border-radius:12px;background:var(--ink-2);overflow:hidden}
+details.more>summary{cursor:pointer;list-style:none;padding:14px 16px;min-height:48px;display:flex;align-items:center;gap:10px;font-weight:600;font-size:.97rem}
+details.more>summary::-webkit-details-marker{display:none}
+details.more>summary::before{content:"+";display:inline-grid;place-items:center;width:22px;height:22px;flex:0 0 auto;border-radius:6px;background:var(--accent-soft);border:1px solid var(--accent);color:var(--accent);font-weight:800;font-size:15px;line-height:1}
+details.more[open]>summary::before{content:"−"}
+details.more>summary:hover{background:var(--surface)}
+.more-body{padding:0 16px 16px;font-size:.95rem;color:var(--muted)}
+.more-body p+p{margin-top:9px}
+.more-body strong{color:var(--text)}
 
-  /* VIZ BANNER */
-  .viz{position:relative;border:1px solid var(--line);border-radius:18px;overflow:hidden;background:radial-gradient(120% 130% at 25% 10%, var(--accent-soft), transparent 60%), var(--ink-2);height:230px;transition:background .6s ease;margin-bottom:18px}
-  .viz canvas{display:block;width:100%;height:100%}
-  .viz .cap{position:absolute;left:15px;bottom:12px;right:15px;font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--muted);letter-spacing:.04em}
-  .viz .cap b{color:var(--accent);font-weight:500;transition:color .6s}
+/* ============================================================
+   5. GRAPHICS
+   ============================================================ */
+figure.viz{margin-top:20px;border:1px solid var(--line);border-radius:var(--radius);background:radial-gradient(120% 130% at 25% 8%,var(--accent-soft),transparent 62%),var(--ink-2);padding:18px 16px 12px}
+figure.viz svg{display:block;width:100%;height:auto}
+figure.viz figcaption{margin-top:10px;font-size:.88rem;color:var(--faint);text-align:center}
+.svg-label{font:600 13px 'Inter',sans-serif;fill:var(--text)}
+.svg-small{font:500 11px 'Inter',sans-serif;fill:var(--muted)}
+.svg-tiny{font:600 10px 'Inter',sans-serif;fill:var(--faint)}
+.svg-box{fill:var(--surface);stroke:var(--line-strong);stroke-width:1.5}
+.svg-accent-box{fill:var(--accent-soft);stroke:var(--accent);stroke-width:1.5}
+.svg-arrow{stroke:var(--faint);stroke-width:1.6;fill:none}
+@keyframes glowPulse{0%,100%{opacity:.35}50%{opacity:1}}
+@keyframes tileIn{0%,100%{opacity:0}18%,82%{opacity:1}}
+@keyframes dash{to{stroke-dashoffset:-14}}
+.anim-glow-1{animation:glowPulse 3s ease-in-out infinite}
+.anim-glow-2{animation:glowPulse 3s ease-in-out infinite 1s}
+.anim-glow-3{animation:glowPulse 3s ease-in-out infinite 2s}
+.anim-tile-1{animation:tileIn 4s ease-in-out infinite .2s}
+.anim-tile-2{animation:tileIn 4s ease-in-out infinite 1s}
+.anim-tile-3{animation:tileIn 4s ease-in-out infinite 1.8s}
+.anim-flow{stroke-dasharray:5 9;animation:dash 1.4s linear infinite}
 
-  /* DETAIL */
-  .detail{background:var(--ink-2);border:1px solid var(--line);border-radius:18px;padding:24px}
-  .top{display:flex;align-items:baseline;gap:12px;flex-wrap:wrap}
-  .big{font-family:'JetBrains Mono',monospace;font-size:13px;color:var(--accent);transition:color .6s}
-  .detail h2{font-family:'Bricolage Grotesque',sans-serif;font-weight:800;font-size:clamp(1.5rem,4.5vw,2rem);letter-spacing:-0.01em;line-height:1.05}
-  .yrs{font-family:'JetBrains Mono',monospace;font-size:12px;color:var(--faint)}
+/* ============================================================
+   6. INTERACTIVE WIDGETS  ("Your turn")
+   ============================================================ */
+.play{margin-top:22px;border:2px solid var(--accent);border-radius:var(--radius);background:var(--ink-2);padding:18px;position:relative}
+.play::before{content:"YOUR TURN";position:absolute;top:-10px;left:16px;background:var(--accent);color:#12102A;font-size:10px;font-weight:800;letter-spacing:.14em;padding:2px 8px;border-radius:5px}
+.play h3{font-family:'Bricolage Grotesque',sans-serif;font-weight:600;font-size:1.12rem;margin:4px 0 6px}
+.play .hint{font-size:.92rem;color:var(--muted);margin-bottom:12px;max-width:62ch}
+.choices{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:12px}
+.choice{min-height:44px;padding:10px 14px;cursor:pointer;background:var(--surface);border:1px solid var(--line-strong);border-radius:10px;color:var(--text);font-family:inherit;font-size:.95rem;font-weight:500;transition:border-color .2s,background .2s}
+.choice:hover:not([disabled]){border-color:var(--accent);background:var(--surface-2)}
+.choice[aria-pressed="true"]{border-color:var(--accent);background:var(--accent-soft)}
+.choice[disabled]{opacity:.45;cursor:default}
+.readout{padding:13px 15px;border-radius:10px;background:var(--surface);border-left:3px solid var(--faint);font-size:.96rem;min-height:52px}
+.readout.ok{border-left-color:var(--good)}
+.readout.no{border-left-color:var(--bad)}
+.readout .tag{font-weight:700;font-size:.8rem;letter-spacing:.08em;text-transform:uppercase;display:block;margin-bottom:3px;color:var(--faint)}
+.readout.ok .tag{color:var(--good)} .readout.no .tag{color:var(--bad)}
+/* training cards */
+.cards{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:12px}
+.tcard{width:76px;border:1px solid var(--line-strong);border-radius:9px;overflow:hidden;background:var(--surface)}
+.tcard svg{display:block;width:100%;height:auto}
+.tcard .cap{font-size:10px;font-weight:600;text-align:center;padding:3px 2px;color:var(--muted)}
+/* sentence builder */
+.built{display:flex;flex-wrap:wrap;gap:6px;align-items:center;margin-bottom:12px;min-height:44px}
+.word{padding:7px 11px;border-radius:8px;background:var(--accent-soft);border:1px solid var(--accent);font-weight:600;font-size:.95rem}
+.word.seed{background:var(--surface);border-color:var(--line-strong);color:var(--muted);font-weight:500}
+.caret{width:2px;height:22px;background:var(--accent);animation:blink 1s step-end infinite}
+@keyframes blink{50%{opacity:0}}
+.likely{font-size:11px;color:var(--faint);font-weight:600;margin-left:6px}
+.play .reset{margin-top:10px;background:none;border:1px solid var(--line);color:var(--muted);border-radius:8px;padding:7px 12px;font-size:.85rem;cursor:pointer;font-family:inherit;min-height:38px}
+.play .reset:hover{border-color:var(--accent);color:var(--text)}
 
-  #d-content{transition:opacity .35s ease, transform .35s ease}
-  #d-content.swap{opacity:0;transform:translateY(8px)}
+/* ============================================================
+   7. NAV BUTTONS / CARDS / QUIZ / REFS / FOOTER
+   ============================================================ */
+.chapter-foot{display:flex;gap:10px;justify-content:space-between;margin-top:26px;padding-bottom:6px}
+.btn{flex:1;min-height:48px;padding:12px 14px;cursor:pointer;background:var(--surface);border:1px solid var(--line);border-radius:12px;color:var(--text);font-family:inherit;font-size:15px;font-weight:600;transition:border-color .2s,background .2s}
+.btn:hover:not([disabled]){border-color:var(--accent);background:var(--surface-2)}
+.btn[disabled]{opacity:.4;cursor:not-allowed}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+@media(max-width:620px){.grid2{grid-template-columns:1fr}}
+.stand-card{background:var(--ink-2);border:1px solid var(--line);border-radius:var(--radius);padding:18px}
+.stand-card h3{font-family:'Bricolage Grotesque',sans-serif;font-weight:600;font-size:1.1rem;margin-bottom:8px}
+.stand-card ul{margin:8px 0 0;padding-left:18px;font-size:.95rem;color:var(--muted)}
+.stand-card li{margin-bottom:5px}
+.quiz-item{background:var(--ink-2);border:1px solid var(--line);border-radius:var(--radius);padding:18px;margin-bottom:14px}
+.quiz-q{font-weight:600;font-size:1.04rem;margin-bottom:12px}
+.quiz-q .qn{color:var(--accent);font-weight:700;margin-right:6px}
+.quiz-opts{display:flex;flex-direction:column;gap:8px}
+.opt{text-align:left;min-height:48px;padding:11px 14px;cursor:pointer;background:var(--surface);border:1px solid var(--line);border-radius:10px;color:var(--text);font-family:inherit;font-size:.97rem;transition:border-color .2s,background .2s}
+.opt:hover:not([disabled]){border-color:var(--accent)}
+.opt[disabled]{cursor:default}
+.opt[data-state="correct"]{border-color:var(--good);background:rgba(111,215,158,.14)}
+.opt[data-state="correct"]::before{content:"✓ Correct — ";font-weight:700;color:var(--good)}
+.opt[data-state="wrong"]{border-color:var(--bad);background:rgba(255,154,133,.12)}
+.opt[data-state="wrong"]::before{content:"✕ Not quite — ";font-weight:700;color:var(--bad)}
+.quiz-fb{margin-top:12px;padding:12px 14px;border-radius:10px;background:var(--accent-soft);border-left:3px solid var(--accent);font-size:.95rem}
+.js .quiz-fb[hidden]{display:none}
+.no-js .quiz-fb[hidden]{display:block}
+.refs{font-size:.93rem;color:var(--muted)}
+.refs ol{padding-left:20px}
+.refs li{margin-bottom:8px}
+.refs a{color:var(--accent);text-decoration:underline;text-underline-offset:2px}
+.asof{display:inline-block;font-size:11px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--ink);background:var(--faint);padding:1px 7px;border-radius:5px;margin-left:6px;vertical-align:middle}
+footer.end{padding:36px 0 72px;border-top:1px solid var(--line)}
+footer.end .concl{font-size:1.05rem;max-width:62ch}
+.final-box{margin-top:22px;padding:20px;border-radius:var(--radius);background:linear-gradient(135deg,var(--surface),var(--ink-2));border:1px solid var(--line-strong)}
+.final-box h2{font-family:'Bricolage Grotesque',sans-serif;font-weight:600;font-size:1.18rem;max-width:62ch;margin-bottom:12px}
+.final-box textarea{width:100%;min-height:96px;padding:12px;border-radius:10px;background:var(--ink);border:1px solid var(--line-strong);color:var(--text);font-family:inherit;font-size:1rem;line-height:1.5;resize:vertical}
+.final-box textarea:focus-visible{outline:3px solid var(--accent);outline-offset:2px}
+.final-box .row{display:flex;gap:10px;flex-wrap:wrap;margin-top:10px}
+.final-box .row button{min-height:44px;padding:10px 16px;border-radius:10px;background:var(--accent);color:#12102A;border:none;font-family:inherit;font-weight:700;font-size:.92rem;cursor:pointer}
+.final-box .row button.ghost{background:none;border:1px solid var(--line);color:var(--muted);font-weight:500}
+.final-box .row button:hover{filter:brightness(1.1)}
+.print-answer{display:none}
+footer.end .credit{margin-top:22px;font-size:.85rem;color:var(--faint)}
 
-  .eli{font-size:1.05rem;color:var(--text);margin:16px 0 4px;font-weight:500}
-  .eli .lead{color:var(--accent);transition:color .6s}
-  .body{color:var(--muted);font-size:0.97rem;margin-top:10px}
+/* ============================================================
+   8. REDUCED MOTION
+   ============================================================ */
+@media (prefers-reduced-motion: reduce){
+  html{scroll-behavior:auto}
+  *,*::before,*::after{animation-duration:.001ms !important;animation-iteration-count:1 !important;transition-duration:.001ms !important}
+  .anim-tile-1,.anim-tile-2,.anim-tile-3,.anim-glow-1,.anim-glow-2,.anim-glow-3{opacity:1 !important}
+  .caret{display:none}
+}
 
-  .block{margin-top:20px}
-  .blabel{font-family:'JetBrains Mono',monospace;font-size:10.5px;letter-spacing:.18em;text-transform:uppercase;color:var(--faint);margin-bottom:9px}
-  .story{font-size:0.98rem;color:var(--text);line-height:1.62}
-  .story b{color:#fff;font-weight:600}
-  .story i{color:var(--accent);font-style:normal}
-
-  .cast{display:flex;flex-wrap:wrap;gap:8px}
-  .person{background:var(--surface);border:1px solid var(--line);border-radius:11px;padding:8px 12px;font-size:13px;line-height:1.35;max-width:100%}
-  .person .nm{font-weight:600;color:var(--accent);font-family:'Bricolage Grotesque',sans-serif;transition:color .6s}
-  .person .rl{color:var(--muted);font-size:12px}
-
-  .stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(118px,1fr));gap:10px}
-  .stat{background:linear-gradient(160deg,var(--surface),var(--ink-2));border:1px solid var(--line);border-radius:13px;padding:13px 14px;opacity:0;animation:rise .5s ease forwards}
-  @keyframes rise{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
-  .stat-n{font-family:'Bricolage Grotesque',sans-serif;font-weight:800;font-size:1.5rem;color:var(--accent);transition:color .6s;line-height:1}
-  .stat-l{font-size:11.5px;color:var(--muted);margin-top:6px;line-height:1.3}
-
-  .moment{padding:12px 14px;border-left:2px solid var(--accent);background:var(--accent-soft);border-radius:0 10px 10px 0;transition:border-color .6s,background .6s}
-  .moment .k{font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--accent);letter-spacing:.1em;text-transform:uppercase;transition:color .6s}
-  .moment p{font-size:0.94rem;color:var(--text);margin-top:4px}
-
-  .uses{list-style:none;display:flex;flex-direction:column;gap:8px}
-  .uses li{position:relative;padding-left:20px;font-size:0.94rem;color:var(--muted)}
-  .uses li::before{content:"";position:absolute;left:2px;top:8px;width:7px;height:7px;border-radius:50%;background:var(--accent);transition:background .6s}
-
-  .pills{display:flex;flex-wrap:wrap;gap:8px;margin-top:10px}
-  .pill{cursor:pointer;border:1px dashed var(--line-strong);border-radius:999px;padding:6px 13px;font-size:13px;color:var(--text);background:transparent;font-family:'JetBrains Mono',monospace;transition:all .2s;user-select:none}
-  .pill:hover{border-color:var(--accent);color:var(--accent)}
-  .pill[data-open="true"]{background:var(--accent-soft);border-style:solid;border-color:var(--accent);color:var(--text)}
-  .pill .def{display:none;font-family:'Inter',sans-serif;color:var(--muted)}
-  .pill[data-open="true"] .def{display:inline}
-  .pill[data-open="true"] .term::after{content:" \2014";color:var(--faint)}
-
-  .navbtns{display:flex;justify-content:space-between;gap:10px;margin-top:24px}
-  .navbtns button{flex:1;background:var(--surface);border:1px solid var(--line);color:var(--text);border-radius:11px;padding:12px;font-family:'Inter';font-size:14px;font-weight:500;cursor:pointer;transition:border-color .2s,background .2s}
-  .navbtns button:hover:not(:disabled){border-color:var(--accent);background:var(--surface-2)}
-  .navbtns button:disabled{opacity:.35;cursor:default}
-
-  /* LANDSCAPE */
-  .grid4{display:grid;grid-template-columns:1fr 1fr;gap:14px}
-  @media(max-width:560px){.grid4{grid-template-columns:1fr}}
-  .force{background:var(--ink-2);border:1px solid var(--line);border-radius:16px;padding:18px}
-  .force .t{font-family:'Bricolage Grotesque',sans-serif;font-weight:600;font-size:1.06rem;margin-bottom:7px}
-  .force .d{font-size:0.91rem;color:var(--muted)}
-  .force .n{font-family:'JetBrains Mono',monospace;font-size:12px;color:#F0C24B;margin-bottom:9px;letter-spacing:.06em}
-
-  /* FLASHCARDS */
-  .card{perspective:1400px;height:210px;cursor:pointer;margin-bottom:14px}
-  .card .inner{position:relative;width:100%;height:100%;transition:transform .6s;transform-style:preserve-3d}
-  .card[data-flip="true"] .inner{transform:rotateY(180deg)}
-  .face{position:absolute;inset:0;backface-visibility:hidden;-webkit-backface-visibility:hidden;border-radius:18px;border:1px solid var(--line);padding:26px;display:flex;flex-direction:column;justify-content:center}
-  .face.front{background:var(--ink-2)}
-  .face.back{background:linear-gradient(135deg,var(--surface),var(--ink-2));transform:rotateY(180deg);border-color:var(--line-strong)}
-  .face .qn{font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--faint);letter-spacing:.16em;text-transform:uppercase;margin-bottom:12px}
-  .face .q{font-family:'Bricolage Grotesque',sans-serif;font-weight:600;font-size:1.18rem;line-height:1.25}
-  .face .a{font-size:1rem;color:var(--text)}
-  .face .hint{font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--faint);margin-top:14px}
-  .cardnav{display:flex;align-items:center;justify-content:space-between;gap:12px}
-  .cardnav button{background:var(--surface);border:1px solid var(--line);color:var(--text);border-radius:11px;padding:10px 18px;cursor:pointer;font-size:14px;font-family:'Inter'}
-  .cardnav button:hover{border-color:var(--accent)}
-  .cardnav .count{font-family:'JetBrains Mono',monospace;font-size:13px;color:var(--muted)}
-
-  .reveal{opacity:0;transform:translateY(16px);transition:opacity .6s ease,transform .6s ease}
-  .reveal.in{opacity:1;transform:none}
-
-  footer{padding:38px 0 70px;border-top:1px solid var(--line);color:var(--faint);font-size:0.9rem}
-  footer b{color:var(--muted);font-weight:600}
-
-  @media (prefers-reduced-motion: reduce){
-    *{scroll-behavior:auto !important;animation:none !important}
-    .reveal{opacity:1;transform:none}
-    .card .inner,#d-content{transition:none}
-  }
+/* ============================================================
+   9. PRINT
+   ============================================================ */
+@media print{
+  body{background:#fff;color:#000;font-size:11pt}
+  .chapter-nav,.chapter-foot,.skip,.quiz-opts,.choices,.play .reset,.final-box .row,figure.viz svg,.strip svg{display:none !important}
+  .chapter[hidden]{display:block !important}
+  .more-body{display:block !important;color:#222}
+  details.more{border:1px solid #999}
+  .quiz-fb{display:block !important;border-left:3px solid #666;background:#f4f4f4;color:#000}
+  .print-answer{display:block !important;border:1px solid #666;padding:8px;min-height:60px;white-space:pre-wrap}
+  .final-box textarea{display:none}
+  h1,h2,h3{color:#000}
+  p{color:#222}
+  a{color:#000;text-decoration:underline}
+  .refs a::after{content:" (" attr(href) ")";font-size:9pt;color:#555}
+  .chapter{page-break-inside:avoid;border-top:1px solid #ccc}
+}
 </style>
 </head>
 <body>
+<a class="skip" href="#main">Skip to the story</a>
 <div class="wrap">
 
-  <header>
-    <div class="eyebrow" id="eyebrow">A field guide · 7 phases · real names & figures</div>
-    <h1>How machines<br>learned to <span class="glow">think</span></h1>
-    <div class="pulse-line"></div>
-    <p class="lede">The whole history of AI is one idea, scaled up over and over: <em>stop writing the rules yourself — let the machine figure them out.</em> Tap through the phases for the people, the money, and the moments behind each leap.</p>
-    <div class="ribbon">
-      <span>rules</span><b>→</b><span>examples</span><b>→</b><span>bigger brains</span><b>→</b><span>attention</span><b>→</b><span>creating</span><b>→</b><span>acting</span>
-    </div>
-  </header>
+<!-- ======================= HERO ======================= -->
+<header class="hero">
+  <p class="eyebrow">An illustrated story in seven chapters</p>
+  <h1>The Bagel That<br>Broke the <span class="glow">Robot</span></h1>
+  <p class="lede" style="font-size:clamp(1.15rem,2.8vw,1.4rem);color:var(--text);font-weight:500">How AI learned seven new tricks — and what it still gets wrong.</p>
+  <p class="lede" style="margin-top:12px">Computers did not wake up smart one morning. People kept teaching them new ways to solve problems — one breakthrough at a time.</p>
+  <p class="note-card"><strong>Meet Maya and Dot.</strong> Maya is a curious 10-year-old. Dot is her robot helper. In every chapter, Dot learns one new trick that fixes a problem from the chapter before. Dot never becomes perfect — and that turns out to be the most interesting part.</p>
+  <p class="note-card" style="margin-top:12px"><strong>One thing to keep in mind:</strong> AI does not think exactly like a person. It learns and uses patterns in data.</p>
+  <p class="note-card" style="margin-top:12px"><strong>And yes — there is a real bagel.</strong> It shows up in chapter 1, defeats a machine with 2,500 carefully written rules, and then refuses to leave. Keep an eye on it.</p>
+</header>
 
-  <section>
-    <div class="sec-label">The timeline · tap a phase</div>
-    <div class="rail" id="rail"></div>
+<!-- ======================= TIMELINE + NAV ======================= -->
+<div class="nav-shell">
+  <h2 class="sec-label" id="strip-label">Seventy years, very unevenly spread</h2>
+  <div class="strip" aria-labelledby="strip-label">
+    <svg viewBox="0 0 620 128" role="img" aria-labelledby="stript stripd">
+      <title id="stript">A timeline from 1950 to 2030 showing that progress was slow then sudden</title>
+      <desc id="stripd">A time axis. From 1956 to 2012 — fifty-six years — only two milestones are marked, and the stretch is labelled as slow progress with long quiet periods. From 2012 to 2026 — just fourteen years — five milestones are crowded together, covering chapters three to seven. The crowding shows how recent most progress is.</desc>
+      <rect x="72" y="66" width="392" height="26" rx="6" fill="rgba(156,151,196,0.10)" stroke="var(--line)" stroke-width="1"/>
+      <rect x="464" y="66" width="98" height="26" rx="6" fill="rgba(255,138,110,0.20)" stroke="#FF8A6E" stroke-width="1.5"/>
+      <line x1="30" y1="79" x2="590" y2="79" stroke="var(--line-strong)" stroke-width="1.5"/>
+      <text class="svg-small" x="268" y="108" text-anchor="middle">56 years · slow progress, big promises, long quiet stretches</text>
+      <text class="svg-small" x="513" y="108" text-anchor="middle" fill="#FF8A6E">14 years</text>
+      <text class="svg-tiny" x="513" y="122" text-anchor="middle">chapters 3–7</text>
+      <g fill="var(--accent)">
+        <circle cx="72" cy="79" r="4"/><circle cx="240" cy="79" r="4"/><circle cx="303" cy="79" r="4"/>
+        <circle cx="464" cy="79" r="4"/><circle cx="499" cy="79" r="4"/><circle cx="534" cy="79" r="4"/><circle cx="562" cy="79" r="4"/>
+      </g>
+      <g stroke="var(--line-strong)" stroke-width="1">
+        <line x1="72" y1="75" x2="72" y2="46"/><line x1="240" y1="75" x2="240" y2="30"/><line x1="303" y1="75" x2="303" y2="46"/>
+        <line x1="464" y1="75" x2="464" y2="14"/><line x1="499" y1="75" x2="499" y2="30"/><line x1="534" y1="75" x2="534" y2="46"/><line x1="562" y1="75" x2="562" y2="14"/>
+      </g>
+      <text class="svg-tiny" x="72" y="42" text-anchor="middle">1956 “AI” named</text>
+      <text class="svg-tiny" x="240" y="26" text-anchor="middle">1980 rules</text>
+      <text class="svg-tiny" x="303" y="42" text-anchor="middle">1989 examples</text>
+      <text class="svg-tiny" x="452" y="10" text-anchor="end">2012 layers</text>
+      <text class="svg-tiny" x="499" y="26" text-anchor="middle">2017</text>
+      <text class="svg-tiny" x="534" y="42" text-anchor="middle">2022</text>
+      <text class="svg-tiny" x="574" y="10" text-anchor="start">2026</text>
+    </svg>
+    <p>The shape of this picture is the story: decades of slow, difficult work — then a rush.</p>
+  </div>
 
-    <div class="viz">
-      <canvas id="net"></canvas>
-      <div class="cap">the machine at this stage: <b id="vizlabel">a handful of rigid rules</b></div>
-    </div>
-
-    <div class="detail">
-      <div class="top">
-        <span class="big" id="d-num">PHASE 01</span>
-        <h2 id="d-name">We write the rules</h2>
-        <span class="yrs" id="d-years">1950s–1980s</span>
-      </div>
-
-      <div id="d-content">
-        <p class="eli"><span class="lead">Teach-me-like-I'm-10:</span> <span id="d-eli"></span></p>
-        <p class="body" id="d-body"></p>
-
-        <div class="block">
-          <div class="blabel">The story</div>
-          <p class="story" id="d-story"></p>
-        </div>
-
-        <div class="block">
-          <div class="blabel">Who was in the room</div>
-          <div class="cast" id="d-cast"></div>
-        </div>
-
-        <div class="block">
-          <div class="blabel">By the numbers</div>
-          <div class="stats" id="d-stats"></div>
-        </div>
-
-        <div class="block moment">
-          <div class="k" id="d-mk">Landmark moment</div>
-          <p id="d-moment"></p>
-        </div>
-
-        <div class="block">
-          <div class="blabel">Where you saw it</div>
-          <ul class="uses" id="d-uses"></ul>
-        </div>
-
-        <div class="block">
-          <div class="blabel">Decode the jargon · tap to reveal</div>
-          <div class="pills" id="d-pills"></div>
-        </div>
-      </div>
-
-      <div class="navbtns">
-        <button id="prev">← Previous</button>
-        <button id="next">Next phase →</button>
-      </div>
-    </div>
-  </section>
-
-  <section class="reveal">
-    <div class="sec-label">What's changing the landscape right now · 2026</div>
-    <div class="grid4" id="forces"></div>
-  </section>
-
-  <section class="reveal">
-    <div class="sec-label">Test yourself · tap the card to flip</div>
-    <div class="card" id="card">
-      <div class="inner">
-        <div class="face front">
-          <div class="qn" id="qn">Question 1</div>
-          <div class="q" id="q"></div>
-          <div class="hint">tap to reveal</div>
-        </div>
-        <div class="face back">
-          <div class="qn">Answer</div>
-          <div class="a" id="a"></div>
-          <div class="hint">tap to flip back</div>
-        </div>
-      </div>
-    </div>
-    <div class="cardnav">
-      <button id="cprev">←</button>
-      <span class="count" id="ccount">1 / 6</span>
-      <button id="cnext">→</button>
-    </div>
-  </section>
-
-  <footer>
-    The throughline to carry into any AI conversation: <b>rules → examples → bigger brains → attention → creating → acting.</b> Six steps, one idea scaled up each time. Phase 7 is where the Perplexity application lives — answers becoming actions, with industry layers (Computer for Counsel today; Education the obvious next vertical).
-  </footer>
-
+  <h2 class="sec-label" id="nav-label">The seven tricks · choose a chapter</h2>
+  <nav class="chapter-nav" aria-labelledby="nav-label">
+    <ol>
+      <li><button class="chip" type="button" data-target="chapter-1-rules"     style="--c:#8FA8EC" aria-current="true"><span class="chip-n">1</span><span class="chip-w">Instructions</span></button></li>
+      <li><button class="chip" type="button" data-target="chapter-2-examples"  style="--c:#5FC9CF"><span class="chip-n">2</span><span class="chip-w">Examples</span></button></li>
+      <li><button class="chip" type="button" data-target="chapter-3-layers"    style="--c:#6FD79E"><span class="chip-n">3</span><span class="chip-w">Layers</span></button></li>
+      <li><button class="chip" type="button" data-target="chapter-4-attention" style="--c:#CBD96B"><span class="chip-n">4</span><span class="chip-w">Attention</span></button></li>
+      <li><button class="chip" type="button" data-target="chapter-5-creation"  style="--c:#F5CE63"><span class="chip-n">5</span><span class="chip-w">Creation</span></button></li>
+      <li><button class="chip" type="button" data-target="chapter-6-senses"    style="--c:#F5A463"><span class="chip-n">6</span><span class="chip-w">Many senses</span></button></li>
+      <li><button class="chip" type="button" data-target="chapter-7-actions"   style="--c:#FF8A6E"><span class="chip-n">7</span><span class="chip-w">Actions</span></button></li>
+    </ol>
+  </nav>
+  <p class="overlap-note">These ideas overlap. The dates show important breakthrough moments — not the exact day each idea was invented.</p>
+  <p class="visually-hidden" id="live-region" role="status" aria-live="polite"></p>
 </div>
 
+<main id="main">
+
+<!-- ======================= CHAPTER 1 ======================= -->
+<article class="chapter" id="chapter-1-rules" style="--accent:#8FA8EC;--accent-soft:rgba(143,168,236,0.16)" aria-labelledby="h-1">
+  <div class="chapter-head"><span class="chapter-num">Chapter 1</span><span class="chapter-idea">Instructions</span><span class="chapter-date">1950s–1980s</span></div>
+  <h2 id="h-1" tabindex="-1">Dot follows exact instructions</h2>
+
+  <div class="block"><p class="blabel">The problem</p>
+    <p>Maya wants toast. Dot has no idea what toast is. Dot knows nothing at all yet.</p></div>
+
+  <div class="block trick"><p class="blabel">Dot's new trick</p>
+    <p>Maya writes down every single step. <em>If</em> the bread is in the slot, <em>then</em> push the lever. <em>If</em> two minutes have passed, <em>then</em> pop it up. Dot follows the list exactly.</p>
+    <p>Toast appears. Maya is delighted. Dot is delighted, in whatever way a robot is delighted.</p>
+    <p>Then Maya's dad puts a <strong>bagel</strong> in the slot.</p>
+    <p>Dot freezes. There is no rule about bagels. Dot does nothing at all while the bagel sits there, quietly not being toasted.</p></div>
+
+  <figure class="viz">
+    <svg viewBox="0 0 620 220" role="img" aria-labelledby="viz1t viz1d">
+      <title id="viz1t">An if–then rule chart for making toast</title>
+      <desc id="viz1d">A flow chart starts at "Bread in slot?". If yes, it goes to "Push lever", then "Wait 2 minutes", then "Pop up toast". A separate lower branch shows a bagel arriving and reaching a box marked "No rule for this — Dot stops", showing that unusual cases break the rules.</desc>
+      <rect class="svg-accent-box" x="14" y="16" width="132" height="42" rx="9"/>
+      <text class="svg-label" x="80" y="42" text-anchor="middle">Bread in slot?</text>
+      <path class="svg-arrow" d="M80 58 L80 84" marker-end="url(#a1)"/><text class="svg-tiny" x="90" y="76">YES</text>
+      <rect class="svg-box" x="14" y="84" width="132" height="42" rx="9"/><text class="svg-label" x="80" y="110" text-anchor="middle">Push the lever</text>
+      <path class="svg-arrow" d="M146 105 L186 105" marker-end="url(#a1)"/>
+      <rect class="svg-box" x="186" y="84" width="132" height="42" rx="9"/><text class="svg-label" x="252" y="110" text-anchor="middle">Wait 2 minutes</text>
+      <path class="svg-arrow" d="M318 105 L358 105" marker-end="url(#a1)"/>
+      <rect class="svg-box" x="358" y="84" width="132" height="42" rx="9"/><text class="svg-label" x="424" y="110" text-anchor="middle">Pop up toast</text>
+      <text class="svg-small" x="424" y="146" text-anchor="middle">Works every time ✓</text>
+      <rect class="svg-box" x="14" y="160" width="132" height="42" rx="9" stroke-dasharray="5 4"/>
+      <text class="svg-label" x="80" y="186" text-anchor="middle">A bagel arrives</text>
+      <path class="svg-arrow anim-flow" d="M146 181 L186 181" marker-end="url(#a1)"/>
+      <rect x="186" y="160" width="240" height="42" rx="9" fill="rgba(255,154,133,0.12)" stroke="#FF9A85" stroke-width="1.5"/>
+      <text class="svg-label" x="306" y="186" text-anchor="middle" fill="#FF9A85">No rule for this. Dot stops.</text>
+      <defs><marker id="a1" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="5" markerHeight="5" orient="auto"><path d="M0 0 L10 5 L0 10 z" fill="var(--faint)"/></marker></defs>
+    </svg>
+    <figcaption>Rules work beautifully — until something unexpected shows up.</figcaption>
+  </figure>
+
+  <!-- WIDGET 1 -->
+  <div class="play" id="play1">
+    <h3>Break Dot's rules yourself</h3>
+    <p class="hint">Dot only knows the toast rules Maya wrote. Put something in the toaster and see what happens.</p>
+    <div class="choices" role="group" aria-label="Choose what to put in the toaster">
+      <button class="choice" type="button" data-p1="bread">Sliced bread</button>
+      <button class="choice" type="button" data-p1="bagel">A bagel</button>
+      <button class="choice" type="button" data-p1="frozen">Frozen bread</button>
+      <button class="choice" type="button" data-p1="foil">A fork</button>
+    </div>
+    <p class="readout" id="p1out" role="status" aria-live="polite"><span class="tag">Dot is waiting</span>Choose something to put in the toaster.</p>
+  </div>
+
+  <div class="block"><p class="blabel">How it works</p>
+    <p>People write the rules by hand. The computer checks each rule in turn. When a rule matches, it does what the rule says. When none match, nothing happens.</p></div>
+
+  <div class="block moment"><p class="blabel">One real moment</p>
+    <p><span class="m-year">1980.</span> A program called XCON started helping a computer company work out which parts belonged in each customer's order. It grew to roughly <strong>2,500 hand-written rules</strong>. For that one narrow job, it did well.</p>
+    <div class="anchor-num"><span class="n">2,500</span><span class="t">If you thought up and wrote <strong>one new rule every single day</strong>, that's about <strong>seven years</strong> of writing. And you'd still be missing the bagel.</span></div>
+  </div>
+
+  <div class="block pair">
+    <div class="pair-card can"><h3><span class="badge">✓</span> What it could do</h3><p>Handle narrow, predictable jobs very reliably. And it could always show you exactly which rule it used — so you could check its work.</p></div>
+    <div class="pair-card cant"><h3><span class="badge">✕</span> What it still got wrong</h3><p>The real world is full of bagels. Every surprise needed a brand-new rule, and nobody could write them all. Worse, new rules kept breaking old ones.</p></div>
+  </div>
+
+  <div class="bridge"><p class="blabel">Which leads to chapter 2</p>
+    <p>What if, instead of writing every rule, we showed Dot many examples?</p></div>
+
+  <details class="more"><summary>Explore the real history</summary><div class="more-body">
+    <p>The phrase <strong>“artificial intelligence”</strong> was coined at a 1956 summer workshop at Dartmouth College, organised by John McCarthy and others.</p>
+    <p>Programs built this way were called <strong>expert systems</strong>. <strong>John McDermott</strong> at Carnegie Mellon began building XCON (also called R1) in 1978 for Digital Equipment Corporation; it went into regular use in 1980 and eventually held about 2,500 rules. Reported savings vary between roughly $10M and $40M a year — a good reminder that widely repeated business numbers are often estimates.</p>
+    <p>The deeper problem was <strong>maintenance</strong>. As rules piled up, changing one could break another in ways nobody predicted. Interest and funding rose and fell several times; researchers nicknamed the quiet stretches “AI winters.” Rule-based systems never disappeared — they still run inside plenty of software today. <a href="#references">See sources ↓</a></p>
+  </div></details>
+
+  <div class="chapter-foot"><button class="btn" type="button" data-nav="prev" disabled>← Previous</button><button class="btn" type="button" data-nav="next">Next: Examples →</button></div>
+</article>
+
+<!-- ======================= CHAPTER 2 ======================= -->
+<article class="chapter" id="chapter-2-examples" hidden style="--accent:#5FC9CF;--accent-soft:rgba(95,201,207,0.16)" aria-labelledby="h-2">
+  <div class="chapter-head"><span class="chapter-num">Chapter 2</span><span class="chapter-idea">Examples</span><span class="chapter-date">1980s–2000s</span></div>
+  <h2 id="h-2" tabindex="-1">Dot learns from examples</h2>
+
+  <div class="block"><p class="blabel">The problem</p>
+    <p>Maya's inbox is full of junk mail. She tries writing rules. <em>If</em> it says “free prize,” <em>then</em> it's junk. But the senders just change their words. Every rule she writes stops working by Friday.</p>
+    <p class="callback"><strong>The bagel problem again.</strong> Maya can't write a rule for every surprise — not for breakfast, and not for her inbox. So this time she doesn't try.</p></div>
+
+  <div class="block trick"><p class="blabel">Dot's new trick</p>
+    <p>Maya stops writing rules. Instead she shows Dot 1,000 emails. She puts a label on each one: <strong>junk</strong> or <strong>not junk</strong>.</p>
+    <p>That's all she does. She never explains what junk mail looks like. Dot studies the labelled piles and works out the patterns itself.</p></div>
+
+  <figure class="viz">
+    <svg viewBox="0 0 620 200" role="img" aria-labelledby="viz2t viz2d">
+      <title id="viz2t">Labelled example cards sorted into two bins</title>
+      <desc id="viz2d">A thousand emails, each labelled by hand as junk or not junk, feed into a middle box where Dot finds the shared patterns. Two bins below show what it learned. No person wrote the patterns down.</desc>
+      <text class="svg-small" x="310" y="18" text-anchor="middle">1,000 emails, each labelled by hand</text>
+      <g class="anim-glow-1"><rect class="svg-box" x="238" y="30" width="66" height="40" rx="7"/><line x1="248" y1="44" x2="294" y2="44" stroke="var(--faint)" stroke-width="2.5"/><line x1="248" y1="54" x2="282" y2="54" stroke="var(--faint)" stroke-width="2.5"/><text class="svg-tiny" x="271" y="66" text-anchor="middle">junk</text></g>
+      <g class="anim-glow-2"><rect class="svg-box" x="316" y="30" width="66" height="40" rx="7"/><line x1="326" y1="44" x2="372" y2="44" stroke="var(--faint)" stroke-width="2.5"/><line x1="326" y1="54" x2="366" y2="54" stroke="var(--faint)" stroke-width="2.5"/><text class="svg-tiny" x="349" y="66" text-anchor="middle">not junk</text></g>
+      <path class="svg-arrow anim-flow" d="M310 74 L310 92" marker-end="url(#a2)"/>
+      <rect class="svg-accent-box" x="228" y="96" width="164" height="40" rx="10"/>
+      <text class="svg-label" x="310" y="121" text-anchor="middle" fill="var(--accent)">Dot finds the patterns</text>
+      <path class="svg-arrow" d="M250 140 Q180 150 150 160" marker-end="url(#a2)"/>
+      <path class="svg-arrow" d="M370 140 Q440 150 470 160" marker-end="url(#a2)"/>
+      <rect x="40" y="160" width="180" height="32" rx="8" fill="rgba(255,154,133,0.10)" stroke="#FF9A85" stroke-width="1.5"/>
+      <text class="svg-small" x="130" y="180" text-anchor="middle" fill="#FF9A85">Junk: odd links, urgent words</text>
+      <rect x="400" y="160" width="180" height="32" rx="8" fill="rgba(111,215,158,0.10)" stroke="#6FD79E" stroke-width="1.5"/>
+      <text class="svg-small" x="490" y="180" text-anchor="middle" fill="#6FD79E">Not junk: people Maya knows</text>
+      <defs><marker id="a2" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="5" markerHeight="5" orient="auto"><path d="M0 0 L10 5 L0 10 z" fill="var(--faint)"/></marker></defs>
+    </svg>
+    <figcaption>Labelled examples in, learned patterns out. That pile of examples has a name: training data.</figcaption>
+  </figure>
+
+  <div class="block"><p class="blabel">How it works</p>
+    <p>The pile of labelled examples is called <strong>training data</strong>. Dot makes a guess about an email, checks it against the label, and adjusts. Do that thousands of times and the guesses get good.</p></div>
+
+  <div class="block moment"><p class="blabel">One real moment</p>
+    <p><span class="m-year">1989.</span> Yann LeCun and colleagues at Bell Labs built a system that learned to read handwritten numbers from labelled examples. It was put to work reading postal codes, and later cheques. The famous practice set of digits, <strong>MNIST</strong>, holds <strong>60,000 labelled training images</strong>.</p>
+    <div class="anchor-num"><span class="n">60,000</span><span class="t">Label them yourself at <strong>five seconds each</strong> and you'd be there about <strong>83 hours</strong> — two full working weeks, no breaks, just typing numbers you can already read at a glance.</span></div>
+  </div>
+
+  <!-- WIDGET 2 -->
+  <div class="play" id="play2">
+    <h3>Teach Dot “dog” — and watch it learn the wrong thing</h3>
+    <p class="hint">Here are the photos Maya collected. Notice anything they have in common? Train Dot, then test it.</p>
+    <div class="cards" id="p2cards" aria-label="Training photos"></div>
+    <div class="choices">
+      <button class="choice" type="button" id="p2train">Train Dot on these photos</button>
+      <button class="choice" type="button" id="p2fix" disabled>Add dogs with no grass, retrain</button>
+    </div>
+    <p class="readout" id="p2learn" role="status" aria-live="polite"><span class="tag">Not trained yet</span>Press “Train Dot” to see what pattern it picks up.</p>
+    <div class="choices" style="margin-top:12px" role="group" aria-label="Test photos">
+      <button class="choice" type="button" data-p2test="dog-grass" disabled>Test: dog on grass</button>
+      <button class="choice" type="button" data-p2test="lawn" disabled>Test: empty lawn</button>
+      <button class="choice" type="button" data-p2test="dog-snow" disabled>Test: dog on snow</button>
+    </div>
+    <p class="readout" id="p2out" role="status" aria-live="polite"><span class="tag">No test yet</span>Train Dot first, then try a test photo.</p>
+    <button class="reset" type="button" id="p2reset">Start over</button>
+  </div>
+
+  <div class="block"><p class="blabel">What just happened</p>
+    <p>Dot learned whatever the examples <em>actually</em> shared — not what Maya meant them to share. Every dog photo had grass, so Dot decided grass means dog.</p>
+    <p>Dot isn't being stupid. It's being obedient. It found a pattern that worked perfectly on every example it was given. The problem was the examples.</p>
+    <p>This matters far beyond dogs. When systems like this are used to sort job applications or decide who gets a loan, and the examples carry old unfairness, Dot learns the unfairness and repeats it — quickly, at scale, and with total confidence.</p></div>
+
+  <div class="block moment" style="border-style:solid;border-color:var(--accent)">
+    <p class="blabel" style="color:var(--accent)">The question every kid asks</p>
+    <p><strong>“Why does Dot need 60,000 pictures? I learned what a dog was from seeing two.”</strong></p>
+    <p style="margin-top:8px">This is a genuinely good question, and researchers do not fully know the answer. But part of it is this: <strong>you weren't starting from zero.</strong></p>
+    <p>By the time someone pointed at a dog, you already knew that objects stay whole when they move, that a thing far away is still the same size, that animals have fronts and backs, that faces matter. You'd been collecting that for two years. You also saw the dog in moving 3D from every angle — not one flat photo. And someone said the word out loud <em>while you were looking</em>.</p>
+    <p>Dot got 60,000 flat pictures and nothing else. No body, no years of watching things fall, nobody pointing. Closing that gap is one of the real open problems in AI.</p>
+  </div>
+
+  <div class="block pair">
+    <div class="pair-card can"><h3><span class="badge">✓</span> What it could do</h3><p>Catch junk mail it had never seen before, because it learned the <em>pattern</em> instead of memorising the words. Rules could never do that.</p></div>
+    <div class="pair-card cant"><h3><span class="badge">✕</span> What it still got wrong</h3><p>Dot only knows what the examples showed it. Bad examples teach the wrong pattern — and Dot can't tell you it learned “grass.” It just quietly gets things wrong later.</p></div>
+  </div>
+
+  <div class="bridge"><p class="blabel">Which leads to chapter 3</p>
+    <p>Examples helped Dot learn simple patterns, but real pictures contained millions of tiny clues. How could Dot combine them?</p></div>
+
+  <details class="more"><summary>Explore the real history</summary><div class="more-body">
+    <p>This family of methods is called <strong>machine learning</strong>. Learning from labelled examples is <strong>supervised learning</strong> — the label is the “supervision.”</p>
+    <p><strong>Yann LeCun</strong> and colleagues applied backpropagation to handwritten digit recognition at Bell Labs starting in 1989; the refined <strong>LeNet-5</strong> was published in 1998. Systems in this family were used commercially to read cheques.</p>
+    <p>The grass problem is real and has a name: <strong>spurious correlation</strong>, or more broadly <strong>bias in training data</strong>. It is not solved. It matters most when models are used to make decisions about people.</p>
+    <p>A myth worth correcting: IBM's <strong>Deep Blue</strong> beat world chess champion Garry Kasparov in 1997, and it's often told as a machine-learning story. It mostly wasn't. Deep Blue relied on custom hardware, searching enormous numbers of positions, and scoring rules hand-tuned with help from human chess masters — closer to chapter 1 than chapter 2. <a href="#references">See sources ↓</a></p>
+  </div></details>
+
+  <div class="chapter-foot"><button class="btn" type="button" data-nav="prev">← Back: Instructions</button><button class="btn" type="button" data-nav="next">Next: Layers →</button></div>
+</article>
+
+<!-- ======================= CHAPTER 3 ======================= -->
+<article class="chapter" id="chapter-3-layers" hidden style="--accent:#6FD79E;--accent-soft:rgba(111,215,158,0.16)" aria-labelledby="h-3">
+  <div class="chapter-head"><span class="chapter-num">Chapter 3</span><span class="chapter-idea">Layers</span><span class="chapter-date">around 2012</span></div>
+  <h2 id="h-3" tabindex="-1">Dot works in layers, like a team of detectives</h2>
+
+  <div class="block"><p class="blabel">The problem</p>
+    <p>Maya shows Dot a photo of her cat. Dot fails. A photo isn't one clue — it's millions of tiny dots of colour. Which ones matter? Looking at them all at once is hopeless.</p></div>
+
+  <div class="block trick"><p class="blabel">Dot's new trick</p>
+    <p>Dot stops working alone and builds a <strong>team of detectives</strong>, sitting in rows.</p>
+    <p>The first row only looks for tiny things: edges, corners, patches of colour. That's all they do. They pass their findings back.</p>
+    <p>The middle row combines those edges into shapes — a curve here, a pointed triangle there. The last row combines the shapes: two pointed triangles, two round eyes, whiskers. <em>“Cat,”</em> says Dot.</p>
+    <p>No single detective knows what a cat is. Together, they get there.</p></div>
+
+  <figure class="viz">
+    <svg viewBox="0 0 620 200" role="img" aria-labelledby="viz3t viz3d">
+      <title id="viz3t">Three layers: edges become shapes, shapes become an object</title>
+      <desc id="viz3d">Three panels in a row. The first shows short edges and corners. An arrow leads to the second, showing those edges combined into triangles and circles. Another arrow leads to the third, showing the shapes combined into a cat's face labelled "Cat".</desc>
+      <rect class="svg-box" x="14" y="30" width="160" height="120" rx="12"/>
+      <text class="svg-tiny" x="94" y="24" text-anchor="middle">FIRST ROW</text>
+      <g stroke="var(--accent)" stroke-width="2.5" stroke-linecap="round" class="anim-glow-1">
+        <line x1="42" y1="56" x2="72" y2="56"/><line x1="92" y1="50" x2="92" y2="80"/>
+        <line x1="112" y1="60" x2="140" y2="84"/><line x1="42" y1="100" x2="70" y2="118"/>
+        <path d="M92 100 L92 122 L114 122" fill="none"/><line x1="128" y1="106" x2="150" y2="106"/>
+      </g>
+      <text class="svg-small" x="94" y="168" text-anchor="middle">edges &amp; colours</text>
+      <path class="svg-arrow" d="M180 90 L212 90" marker-end="url(#a3)"/>
+      <rect class="svg-box" x="222" y="30" width="160" height="120" rx="12"/>
+      <text class="svg-tiny" x="302" y="24" text-anchor="middle">MIDDLE ROW</text>
+      <g stroke="var(--accent)" stroke-width="2.5" fill="none" class="anim-glow-2">
+        <path d="M252 96 L268 62 L284 96 Z"/><path d="M320 96 L336 62 L352 96 Z"/>
+        <circle cx="270" cy="120" r="10"/><circle cx="334" cy="120" r="10"/>
+      </g>
+      <text class="svg-small" x="302" y="168" text-anchor="middle">shapes</text>
+      <path class="svg-arrow" d="M388 90 L420 90" marker-end="url(#a3)"/>
+      <rect class="svg-accent-box" x="430" y="30" width="160" height="120" rx="12"/>
+      <text class="svg-tiny" x="510" y="24" text-anchor="middle">LAST ROW</text>
+      <g class="anim-glow-3">
+        <path d="M470 100 L482 66 L496 92" fill="none" stroke="var(--accent)" stroke-width="2.5"/>
+        <path d="M550 100 L538 66 L524 92" fill="none" stroke="var(--accent)" stroke-width="2.5"/>
+        <circle cx="510" cy="104" r="30" fill="none" stroke="var(--accent)" stroke-width="2.5"/>
+        <circle cx="499" cy="98" r="3.5" fill="var(--accent)"/><circle cx="521" cy="98" r="3.5" fill="var(--accent)"/>
+        <path d="M504 114 Q510 120 516 114" fill="none" stroke="var(--accent)" stroke-width="2"/>
+      </g>
+      <text class="svg-label" x="510" y="168" text-anchor="middle" fill="var(--accent)">“Cat”</text>
+      <defs><marker id="a3" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="5" markerHeight="5" orient="auto"><path d="M0 0 L10 5 L0 10 z" fill="var(--faint)"/></marker></defs>
+    </svg>
+    <figcaption>Small clues become shapes. Shapes become an answer. That stack of rows is what “layers” means.</figcaption>
+  </figure>
+
+  <div class="block trick" style="border-left-color:var(--good);background:rgba(111,215,158,0.10)">
+    <p class="blabel" style="color:var(--good)">Meanwhile, in the kitchen</p>
+    <p>Maya fetches the bagel from chapter 1 and holds it up to the camera.</p>
+    <p><em>“Bagel,”</em> says Dot.</p>
+    <p>Maya cheers. Nobody wrote a bagel rule. Nobody wrote any rule. Dot just <em>looked</em> — and after enough examples and enough layers, it knew.</p>
+  </div>
+
+  <div class="block"><p class="blabel">How it works</p>
+    <p>Each row of detectives is a <strong>layer</strong>. Every layer passes what it found to the next one. Stack up enough layers, train them on lots of labelled pictures, and the whole team gets sharp.</p>
+    <p>People sometimes call this a “brain-like” system. It isn't a brain. It's maths arranged in rows, loosely inspired by an old idea about brain cells.</p></div>
+
+  <div class="block moment"><p class="blabel">One real moment</p>
+    <p><span class="m-year">2012.</span> A yearly contest asked programs to name what was in photos, using a huge collection of labelled images called ImageNet. A layered system nicknamed <strong>AlexNet</strong> made an error only <strong>15.3%</strong> of the time. The runner-up, built the old way, was about 26%. That gap changed the field almost overnight.</p>
+    <div class="anchor-num"><span class="n">15.3%</span><span class="t">Out of <strong>100 photos</strong>, AlexNet got about <strong>15 wrong</strong>. The next-best got about <strong>26 wrong</strong>. Eleven photos doesn't sound like much — but it was the difference between “interesting experiment” and “put it in your phone.”</span></div>
+  </div>
+
+  <div class="block pair">
+    <div class="pair-card can"><h3><span class="badge">✓</span> What it could do</h3><p>Recognise objects in messy real photos far better than anything before — which is why your phone can find every picture of your dog. And why it finally caught the bagel.</p></div>
+    <div class="pair-card cant"><h3><span class="badge">✕</span> What it still got wrong</h3><p>Dot spots patterns, but doesn't know what a cat <em>is</em>. Change a few dots of colour that a person wouldn't even notice, and Dot may confidently say “bus.”</p></div>
+  </div>
+
+  <div class="bridge"><p class="blabel">Which leads to chapter 4</p>
+    <p>Dot became much better at pictures. But sentences were difficult, because words can affect other words far away.</p></div>
+
+  <details class="more"><summary>Explore the real history</summary><div class="more-body">
+    <p>These layered systems are called <strong>neural networks</strong>; stacking many layers is <strong>deep learning</strong>. The “neural” name is historical — loosely inspired by biological neurons, not copies of them.</p>
+    <p><strong>Fei-Fei Li</strong> and colleagues released <strong>ImageNet</strong> in 2009 — the huge labelled dataset that made the contest possible. In 2012 <strong>Alex Krizhevsky</strong>, with Ilya Sutskever and Geoffrey Hinton at Toronto, entered AlexNet, trained on ordinary gaming graphics chips (GPUs). Its top-5 error of 15.3% beat the runner-up's ~26%.</p>
+    <p>The idea was much older than 2012 and had a bumpy road. Frank Rosenblatt's <strong>Perceptron</strong> (1958) was an early single-layer version, hyped heavily in the press. A 1969 book by Marvin Minsky and Seymour Papert set out clear limits of that design, and interest cooled for years. What eventually made deep networks practical was a mix of better training methods, far more data, and much faster chips — not one single insight.</p>
+    <p><strong>Also worth knowing:</strong> in 2016, DeepMind's AlphaGo beat top Go player Lee Sedol 4–1. It combined layered networks with game-tree search and self-play, so it isn't the same recipe as image recognition — but it convinced many people that deep learning was serious. <a href="#references">See sources ↓</a></p>
+  </div></details>
+
+  <div class="chapter-foot"><button class="btn" type="button" data-nav="prev">← Back: Examples</button><button class="btn" type="button" data-nav="next">Next: Attention →</button></div>
+</article>
+
+<!-- ======================= CHAPTER 4 ======================= -->
+<article class="chapter" id="chapter-4-attention" hidden style="--accent:#CBD96B;--accent-soft:rgba(203,217,107,0.16)" aria-labelledby="h-4">
+  <div class="chapter-head"><span class="chapter-num">Chapter 4</span><span class="chapter-idea">Attention</span><span class="chapter-date">2017</span></div>
+  <h2 id="h-4" tabindex="-1">Dot connects the important words</h2>
+
+  <div class="block"><p class="blabel">The problem</p>
+    <p>Dot can spot a bagel across the kitchen. So Maya leaves it a note:</p>
+    <p style="font-size:1.1rem;font-weight:600;margin-top:8px">“The dog chased the ball because it was rolling.”</p>
+    <p>Then she asks: what is <em>it</em>? Dot is stuck. Dot was reading one word at a time, and by the time it reached “it,” the word “ball” felt far away and long ago.</p>
+    <p class="callback"><strong>Odd, isn't it?</strong> Dot can recognise a bagel from a blurry photo, but can't work out what a three-letter word points at. Seeing and reading turned out to be different problems.</p></div>
+
+  <div class="block trick"><p class="blabel">Dot's new trick</p>
+    <p>Dot stops reading in a straight line. For every word, Dot looks at the other words and decides which ones matter <em>to that word</em>.</p>
+    <p>For “it,” Dot compares two candidates: <strong>dog</strong> and <strong>ball</strong>. Which one rolls? Dot gives “ball” a strong link and “dog” a weak one. This trick is called <strong>attention</strong>.</p></div>
+
+  <figure class="viz">
+    <svg viewBox="0 0 620 190" role="img" aria-labelledby="viz4t viz4d">
+      <title id="viz4t">Attention links "it" to "ball" more strongly than to "dog"</title>
+      <desc id="viz4d">The sentence "The dog chased the ball because it was rolling" is laid out in a row. Two curved links rise from the word "it": a thick bright link to "ball" labelled strong link, and a thin faint link to "dog" labelled weak link.</desc>
+      <text class="svg-tiny" x="310" y="16" text-anchor="middle">Dot checks every word against every other word</text>
+      <path d="M422 96 Q354 32 286 96" fill="none" stroke="var(--accent)" stroke-width="4" opacity="0.95"/>
+      <path d="M422 96 Q257 14 92 96" fill="none" stroke="var(--faint)" stroke-width="1.3" opacity="0.55" stroke-dasharray="4 5"/>
+      <text class="svg-tiny" x="354" y="44" text-anchor="middle" fill="var(--accent)">strong link</text>
+      <text class="svg-tiny" x="212" y="34" text-anchor="middle">weak link</text>
+      <g>
+        <rect class="svg-box" x="14" y="96" width="44" height="34" rx="7"/><text class="svg-small" x="36" y="118" text-anchor="middle">The</text>
+        <rect class="svg-box" x="66" y="96" width="52" height="34" rx="7"/><text class="svg-label" x="92" y="118" text-anchor="middle">dog</text>
+        <rect class="svg-box" x="126" y="96" width="74" height="34" rx="7"/><text class="svg-small" x="163" y="118" text-anchor="middle">chased</text>
+        <rect class="svg-box" x="208" y="96" width="44" height="34" rx="7"/><text class="svg-small" x="230" y="118" text-anchor="middle">the</text>
+        <rect class="svg-accent-box" x="260" y="96" width="52" height="34" rx="7"/><text class="svg-label" x="286" y="118" text-anchor="middle">ball</text>
+        <rect class="svg-box" x="320" y="96" width="76" height="34" rx="7"/><text class="svg-small" x="358" y="118" text-anchor="middle">because</text>
+        <rect class="svg-accent-box" x="404" y="96" width="36" height="34" rx="7"/><text class="svg-label" x="422" y="118" text-anchor="middle">it</text>
+        <rect class="svg-box" x="448" y="96" width="52" height="34" rx="7"/><text class="svg-small" x="474" y="118" text-anchor="middle">was</text>
+        <rect class="svg-box" x="508" y="96" width="76" height="34" rx="7"/><text class="svg-small" x="546" y="118" text-anchor="middle">rolling</text>
+      </g>
+      <text class="svg-small" x="310" y="166" text-anchor="middle">Balls roll. So “it” probably means the ball.</text>
+    </svg>
+    <figcaption>Attention lets a model compare a word with every other word, near or far.</figcaption>
+  </figure>
+
+  <div class="block"><p class="blabel">How it works</p>
+    <p>Dot gives every pair of words a score for how much they matter to each other. High score, strong link. Because Dot checks the pairs together instead of in a queue, computers can do a lot of that work at the same time — which makes training much faster.</p>
+    <div class="anchor-num"><span class="n">81</span><span class="t">That sentence has <strong>9 words</strong>, so there are <strong>9 × 9 = 81 pairs</strong> to score. Double the sentence to 18 words and it jumps to <strong>324</strong>. This is why long documents are still hard: the work grows much faster than the text does.</span></div>
+  </div>
+
+  <div class="block moment"><p class="blabel">One real moment</p>
+    <p><span class="m-year">2017.</span> Eight researchers at Google published a paper with a bold title: <strong>“Attention Is All You Need.”</strong> It introduced a design called the <strong>Transformer</strong>. Transformer-style designs power many of today's leading language models — the “T” in ChatGPT stands for Transformer.</p></div>
+
+  <div class="block pair">
+    <div class="pair-card can"><h3><span class="badge">✓</span> What it could do</h3><p>Handle long sentences where distant words matter. Translate far better. And train quickly enough to learn from truly enormous amounts of text.</p></div>
+    <div class="pair-card cant"><h3><span class="badge">✕</span> What it still got wrong</h3><p>Linking words is not the same as understanding them. Dot still trips over tricky sentences — and as you saw, every extra word costs it dearly.</p></div>
+  </div>
+
+  <div class="bridge"><p class="blabel">Which leads to chapter 5</p>
+    <p>Once Dot became better at connecting words, it became surprisingly good at guessing what should come next.</p></div>
+
+  <details class="more"><summary>Explore the real history</summary><div class="more-body">
+    <p>The paper was <strong>“Attention Is All You Need”</strong> (Vaswani et al., 2017), with eight authors, published while they were at Google. It was aimed at machine translation; its wider influence came later.</p>
+    <p>Attention wasn't brand new in 2017 — earlier translation systems already used a version of it. The Transformer's contribution was to <strong>drop the step-by-step recurrence</strong> and lean on attention, which made training far more parallel.</p>
+    <p>The 81-pairs point is real: standard self-attention cost grows with the <strong>square</strong> of the sequence length. A great deal of research since has gone into making that cheaper, which is why context windows keep getting longer.</p>
+    <p>Transformer-style architectures dominate language models today, but avoid absolutes: other designs exist and are actively researched, and many real systems mix approaches. <a href="#references">See sources ↓</a></p>
+  </div></details>
+
+  <div class="chapter-foot"><button class="btn" type="button" data-nav="prev">← Back: Layers</button><button class="btn" type="button" data-nav="next">Next: Creation →</button></div>
+</article>
+
+<!-- ======================= CHAPTER 5 (format break: play first) ======================= -->
+<article class="chapter" id="chapter-5-creation" hidden style="--accent:#F5CE63;--accent-soft:rgba(245,206,99,0.16)" aria-labelledby="h-5">
+  <div class="chapter-head"><span class="chapter-num">Chapter 5</span><span class="chapter-idea">Creation</span><span class="chapter-date">2020–2022</span></div>
+  <h2 id="h-5" tabindex="-1">Dot creates by predicting what comes next</h2>
+
+  <div class="block"><p class="blabel">The problem</p>
+    <p>Dot could sort things and connect words. But Maya wants a bedtime story. Sorting can't make a story. Dot has never made anything new.</p>
+    <p>So before we explain this one — play it yourself.</p></div>
+
+  <!-- WIDGET 3 — leads the chapter -->
+  <div class="play" id="play3">
+    <h3>Be the predictor</h3>
+    <p class="hint">Pick the word you think comes next. Then do it again. And again. That's the entire trick.</p>
+    <div class="built" id="p3built"></div>
+    <div class="choices" id="p3choices" role="group" aria-label="Pick the next word"></div>
+    <p class="readout" id="p3out" role="status" aria-live="polite"><span class="tag">Round 1 of 5</span>Pick a word to follow “Once upon a”.</p>
+    <button class="reset" type="button" id="p3reset">Start over</button>
+  </div>
+
+  <div class="block trick"><p class="blabel">Dot's new trick</p>
+    <p>That's it. That's the whole thing.</p>
+    <p>Dot has read an enormous amount of text, so it's very good at the guessing game. Guess a piece, add it, guess again. Repeat — very fast, thousands of times — and stories, summaries, answers, and computer code all come out.</p>
+    <p>Dot isn't reciting a story it has stored somewhere. It's guessing what fits next, over and over.</p></div>
+
+  <div class="block"><p class="blabel">How it works</p>
+    <p>Dot works out which piece is <em>likely</em> to come next, adds it, and repeats.</p>
+    <p>Here's the catch, and it's the most important sentence on this page: <strong>likely-sounding is not the same as true.</strong> Dot is guessing what <em>fits</em>, not checking what's <em>real</em>.</p></div>
+
+  <div class="block moment" style="border-color:var(--bad);border-style:solid">
+    <p class="blabel" style="color:var(--bad)">Meanwhile, in the kitchen</p>
+    <p>Maya, curious, asks: <em>“Dot, who invented the bagel?”</em></p>
+    <p style="margin-top:8px">Dot answers instantly and warmly: <em>“The bagel was invented in 1683 by a baker named Johann Kessler, to celebrate a famous horse ride.”</em></p>
+    <p style="margin-top:8px">It sounds wonderful. The date is specific. The name has a ring to it. Maya nearly writes it down.</p>
+    <p style="margin-top:8px"><strong>Dot made it up.</strong> Not to trick her — Dot was doing exactly its job, assembling words that <em>fit</em>. A confident name and a precise year are what usually comes next in a sentence like that. Fitting and true are not the same thing, and Dot cannot tell the difference.</p>
+  </div>
+
+  <!-- The half-trick: human feedback -->
+  <div class="block trick" style="border-left-color:var(--good);background:rgba(111,215,158,0.10)">
+    <p class="blabel" style="color:var(--good)">Dot's half-trick: people teach it what “good” means</p>
+    <p>There's a step almost everyone skips, and it's the one that made any of this useful.</p>
+    <p>A pure next-word guesser is <em>not</em> a helpful assistant. Ask an untrained one “What is the capital of France?” and it may cheerfully continue with <em>“What is the capital of Spain? What is the capital of Peru?”</em> — because on the internet, questions are usually followed by more questions. It's guessing perfectly. It's just useless.</p>
+    <p>So people stepped in. Human workers wrote out good answers by hand. Then they were shown pairs of Dot's answers and asked, over and over: <strong>which of these two is better?</strong> Those judgements were used to teach Dot what a helpful answer looks like.</p>
+    <p style="margin-top:10px"><strong>Every chatbot you have ever used was shaped by people sitting at desks, patiently rating answers.</strong> That's not a footnote to the story. It's the reason chapter 5 has a chapter 6 and 7 at all.</p>
+  </div>
+
+  <figure class="viz">
+    <svg viewBox="0 0 620 180" role="img" aria-labelledby="viz5t viz5d">
+      <title id="viz5t">Humans rate two answers to teach the model what a good answer looks like</title>
+      <desc id="viz5d">One question produces two draft answers, A and B. A person compares them and picks B as better. That judgement, repeated many thousands of times, trains the model toward helpful answers. The diagram is labelled "repeated tens of thousands of times, by people".</desc>
+      <rect class="svg-box" x="14" y="66" width="112" height="42" rx="9"/>
+      <text class="svg-small" x="70" y="92" text-anchor="middle">one question</text>
+      <path class="svg-arrow" d="M130 78 L162 56" marker-end="url(#a5b)"/>
+      <path class="svg-arrow" d="M130 96 L162 118" marker-end="url(#a5b)"/>
+      <rect class="svg-box" x="166" y="34" width="118" height="40" rx="9"/>
+      <text class="svg-small" x="225" y="58" text-anchor="middle">Answer A</text>
+      <rect class="svg-box" x="166" y="100" width="118" height="40" rx="9"/>
+      <text class="svg-small" x="225" y="124" text-anchor="middle">Answer B</text>
+      <path class="svg-arrow" d="M288 54 L322 76" marker-end="url(#a5b)"/>
+      <path class="svg-arrow" d="M288 120 L322 98" marker-end="url(#a5b)"/>
+      <circle cx="356" cy="87" r="26" fill="rgba(111,215,158,0.16)" stroke="#6FD79E" stroke-width="2"/>
+      <circle cx="356" cy="79" r="7" fill="none" stroke="#6FD79E" stroke-width="2"/>
+      <path d="M344 100 Q356 88 368 100" fill="none" stroke="#6FD79E" stroke-width="2"/>
+      <text class="svg-tiny" x="356" y="130" text-anchor="middle" fill="#6FD79E">a person</text>
+      <text class="svg-tiny" x="356" y="144" text-anchor="middle" fill="#6FD79E">compares</text>
+      <path class="svg-arrow" d="M386 87 L420 87" marker-end="url(#a5b)"/>
+      <rect class="svg-accent-box" x="424" y="60" width="182" height="54" rx="10" fill="rgba(111,215,158,0.12)" stroke="#6FD79E"/>
+      <text class="svg-small" x="515" y="82" text-anchor="middle" fill="var(--text)">“B is better.”</text>
+      <text class="svg-tiny" x="515" y="100" text-anchor="middle">Dot learns what good looks like</text>
+      <text class="svg-tiny" x="310" y="168" text-anchor="middle">Repeated tens of thousands of times, by people.</text>
+      <defs><marker id="a5b" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="5" markerHeight="5" orient="auto"><path d="M0 0 L10 5 L0 10 z" fill="var(--faint)"/></marker></defs>
+    </svg>
+    <figcaption>Humans are not outside the machine. They're inside the training loop.</figcaption>
+  </figure>
+
+  <div class="block moment"><p class="blabel">One real moment</p>
+    <p><span class="m-year">30 November 2022.</span> OpenAI put a simple chat box in front of one of these models and called it <strong>ChatGPT</strong>. Two things made it work: the model had been taught by human raters to actually answer questions, and anyone could now just type. Reports at the time estimated it reached about <strong>100 million users in two months</strong>.</p>
+    <div class="anchor-num"><span class="n">1.3B<br><span style="font-size:.9rem">beat</span><br>175B</span><span class="t">Here's the fact that should stop you. Researchers took a model with <strong>175 billion</strong> parameters and one with <strong>1.3 billion</strong> — 100 times smaller. The small one was trained with human feedback. Human raters <strong>preferred the small one's answers</strong>.<br><br>Being 100× bigger lost to being taught by people what “good” means.</span></div>
+    <p style="margin-top:12px;font-size:.93rem;color:var(--faint)">(And for scale on “175 billion”: if you counted the parameters out loud, one per second, without ever sleeping, you'd finish in about <strong>5,500 years</strong>.)</p>
+  </div>
+
+  <div class="block pair">
+    <div class="pair-card can"><h3><span class="badge">✓</span> What it could do</h3><p>Write stories, explain ideas, summarise long text, draft code, and answer questions in ordinary language — helpfully, because people taught it what helpful means.</p></div>
+    <div class="pair-card cant"><h3><span class="badge">✕</span> What it still got wrong</h3><p>Sometimes Dot invents an answer that sounds confident but is not true. People call these <strong>hallucinations</strong>. Dot won't look embarrassed. It sounds exactly as sure as when it's right — ask it about bagels and see.</p></div>
+  </div>
+
+  <div class="bridge"><p class="blabel">Which leads to chapter 6</p>
+    <p>But the world is not made only of words. It also contains pictures, voices, music, and video.</p></div>
+
+  <details class="more"><summary>Explore the real history</summary><div class="more-body">
+    <p>These are <strong>large language models (LLMs)</strong>. The pieces they predict are <strong>tokens</strong> — roughly a word or part of a word. The dials adjusted while learning are <strong>parameters</strong>.</p>
+    <p>Two separate things get blurred together:</p>
+    <p><strong>1. The scaling.</strong> OpenAI's GPT-3 (2020 paper) had <strong>175 billion parameters</strong>, up from 117 million in GPT-1 (2018). Making models bigger, with more data and compute, kept improving them.</p>
+    <p><strong>2. The human feedback.</strong> The technique is <strong>RLHF</strong> — reinforcement learning from human feedback. In OpenAI's <strong>InstructGPT</strong> work (Ouyang et al., 2022), labellers wrote example answers and ranked model outputs; those rankings trained a “reward model,” which was then used to fine-tune the language model. OpenAI reported that human evaluators preferred outputs from a <strong>1.3B-parameter InstructGPT over the 175B GPT-3</strong>. OpenAI described ChatGPT as a sibling model to InstructGPT, trained with the same method.</p>
+    <p><strong>3. The interface.</strong> ChatGPT launched 30 November 2022 as a “research preview.” The “100 million users in two months” figure comes from a UBS estimate reported by Reuters in February 2023 — an outside estimate, not an audited company number.</p>
+    <p>Hallucination isn't a bug someone forgot to fix. It follows from how the system works: it is built to produce likely text, and likely text is usually — but not always — true. RLHF reduces it. It does not remove it.</p>
+    <p>Worth sitting with: the people who do this rating work are usually contractors, often paid modestly, and some review genuinely distressing material so that models won't repeat it. They rarely appear in the story. <a href="#references">See sources ↓</a></p>
+  </div></details>
+
+  <div class="chapter-foot"><button class="btn" type="button" data-nav="prev">← Back: Attention</button><button class="btn" type="button" data-nav="next">Next: Many senses →</button></div>
+</article>
+
+<!-- ======================= CHAPTER 6 ======================= -->
+<article class="chapter" id="chapter-6-senses" hidden style="--accent:#F5A463;--accent-soft:rgba(245,164,99,0.16)" aria-labelledby="h-6">
+  <div class="chapter-head"><span class="chapter-num">Chapter 6</span><span class="chapter-idea">Many senses</span><span class="chapter-date">2023–2025</span></div>
+  <h2 id="h-6" tabindex="-1">Dot combines different kinds of information</h2>
+
+  <div class="block"><p class="blabel">The problem</p>
+    <p>Maya's plant is going yellow. She could type a description — but she'd have to find the right words for a colour she can see perfectly well. Words-only Dot can't help with a thing you point at.</p></div>
+
+  <div class="block trick"><p class="blabel">Dot's new trick</p>
+    <p>Maya holds up her phone, takes a photo of the drooping yellow leaves, and just asks out loud: <em>“What's wrong with my plant?”</em></p>
+    <p>Dot takes in all three at once — the picture, her spoken question, and what it has read about plants — and answers: the leaves are yellow near the bottom and the soil looks wet, so this might be too much water.</p></div>
+
+  <figure class="viz">
+    <svg viewBox="0 0 620 200" role="img" aria-labelledby="viz6t viz6d">
+      <title id="viz6t">Text, image, and sound each become patterns the model can combine</title>
+      <desc id="viz6d">Three inputs on the left — a text box, a picture of a plant, and a sound wave — feed arrows into a middle box labelled "Each one becomes numbers, then patterns". An arrow leads to an answer box reading "Those yellow leaves may mean too much water."</desc>
+      <text class="svg-tiny" x="76" y="16" text-anchor="middle">THREE KINDS OF INPUT</text>
+      <rect class="svg-box" x="14" y="26" width="124" height="38" rx="8"/>
+      <line x1="28" y1="40" x2="112" y2="40" stroke="var(--faint)" stroke-width="2.5"/>
+      <line x1="28" y1="52" x2="88" y2="52" stroke="var(--faint)" stroke-width="2.5"/>
+      <text class="svg-tiny" x="150" y="49">words</text>
+      <rect class="svg-box" x="14" y="76" width="124" height="46" rx="8"/>
+      <path d="M56 112 Q76 82 96 112" fill="none" stroke="#F5CE63" stroke-width="2.5"/>
+      <line x1="76" y1="112" x2="76" y2="92" stroke="var(--faint)" stroke-width="2"/>
+      <text class="svg-tiny" x="150" y="103">a picture</text>
+      <rect class="svg-box" x="14" y="134" width="124" height="38" rx="8"/>
+      <g stroke="var(--accent)" stroke-width="2.5" stroke-linecap="round">
+        <line x1="40" y1="146" x2="40" y2="160"/><line x1="52" y1="140" x2="52" y2="166"/>
+        <line x1="64" y1="148" x2="64" y2="158"/><line x1="76" y1="138" x2="76" y2="168"/>
+        <line x1="88" y1="146" x2="88" y2="160"/><line x1="100" y1="142" x2="100" y2="164"/>
+      </g>
+      <text class="svg-tiny" x="150" y="157">her voice</text>
+      <path class="svg-arrow anim-flow" d="M196 45 Q240 45 268 88" marker-end="url(#a6)"/>
+      <path class="svg-arrow anim-flow" d="M196 99 L268 99" marker-end="url(#a6)"/>
+      <path class="svg-arrow anim-flow" d="M196 153 Q240 153 268 110" marker-end="url(#a6)"/>
+      <rect class="svg-accent-box" x="272" y="62" width="140" height="74" rx="12"/>
+      <text class="svg-small" x="342" y="90" text-anchor="middle" fill="var(--text)">Each one becomes</text>
+      <text class="svg-small" x="342" y="106" text-anchor="middle" fill="var(--text)">numbers, then</text>
+      <text class="svg-label" x="342" y="124" text-anchor="middle" fill="var(--accent)">patterns</text>
+      <path class="svg-arrow" d="M418 99 L448 99" marker-end="url(#a6)"/>
+      <rect class="svg-box" x="452" y="66" width="154" height="66" rx="10"/>
+      <text class="svg-small" x="529" y="90" text-anchor="middle">“Those yellow leaves</text>
+      <text class="svg-small" x="529" y="106" text-anchor="middle">may mean too</text>
+      <text class="svg-small" x="529" y="122" text-anchor="middle">much water.”</text>
+      <text class="svg-tiny" x="310" y="192" text-anchor="middle">Dot does not see or hear. It turns each input into patterns it can process.</text>
+      <defs><marker id="a6" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="5" markerHeight="5" orient="auto"><path d="M0 0 L10 5 L0 10 z" fill="var(--faint)"/></marker></defs>
+    </svg>
+    <figcaption>Words, pictures, and sound all become patterns — which is how one model can handle them together.</figcaption>
+  </figure>
+
+  <div class="block"><p class="blabel">How it works</p>
+    <p>A <strong>multimodal</strong> model can take in combinations of text, images, audio, and video. Each kind of input gets turned into numbers, and the model works with those patterns together.</p>
+    <p>Be careful with the word “senses.” Dot does not see the plant or hear Maya the way you do. It converts a photo and a sound into patterns, and finds connections between them.</p></div>
+
+  <div class="block moment"><p class="blabel">One real moment</p>
+    <p><span class="m-year">March 2023.</span> OpenAI released <strong>GPT-4</strong>, which could accept both images and text as input and respond in text. Over the next two years, models handling several kinds of input at once became ordinary rather than remarkable.</p></div>
+
+  <p class="callback"><strong>The bagel, one last time.</strong> Maya's dad finally toasts it — and burns it. Maya photographs the wreckage and asks Dot what went wrong. Dot looks at the char, listens to her question, and suggests the setting was too high. Four chapters ago, this bagel made Dot freeze solid. It has come a long way. It still didn't smell the smoke.</p>
+
+  <div class="block pair">
+    <div class="pair-card can"><h3><span class="badge">✓</span> What it could do</h3><p>Answer questions about a photo, read a chart you point at, follow a spoken question, or describe what's happening in a video.</p></div>
+    <div class="pair-card cant"><h3><span class="badge">✕</span> What it still got wrong</h3><p>Dot misreads images and states wrong guesses confidently. And it only knows what's in the picture. It can't touch the soil, smell the smoke, or know Maya watered the plant twice this morning.</p></div>
+  </div>
+
+  <div class="bridge"><p class="blabel">Which leads to chapter 7</p>
+    <p>Dot could understand and create many kinds of information, but it still waited for Maya to give every instruction.</p></div>
+
+  <details class="more"><summary>Explore the real history</summary><div class="more-body">
+    <p>The word is <strong>multimodal</strong> — each “mode” is a kind of input: text, image, audio, video. Turning an input into a list of numbers the model can use is called creating an <strong>embedding</strong>.</p>
+    <p>GPT-4 was announced in March 2023 and accepted image and text inputs, returning text. Other labs shipped models with overlapping abilities around the same period; the timing is genuinely close, and “who was first” depends on which specific ability you count.</p>
+    <p><strong>A separate note:</strong> in 2024, Geoffrey Hinton and John Hopfield shared the Nobel Prize in Physics for foundational work on machine learning with artificial neural networks — the ideas behind chapter 3, honoured decades later. A nice bit of history, but not part of the multimodal story. <a href="#references">See sources ↓</a></p>
+  </div></details>
+
+  <div class="chapter-foot"><button class="btn" type="button" data-nav="prev">← Back: Creation</button><button class="btn" type="button" data-nav="next">Next: Actions →</button></div>
+</article>
+
+<!-- ======================= CHAPTER 7 ======================= -->
+<article class="chapter" id="chapter-7-actions" hidden style="--accent:#FF8A6E;--accent-soft:rgba(255,138,110,0.16)" aria-labelledby="h-7">
+  <div class="chapter-head"><span class="chapter-num">Chapter 7</span><span class="chapter-idea">Actions</span><span class="chapter-date">2025–2026</span></div>
+  <h2 id="h-7" tabindex="-1">Dot makes a plan and uses tools</h2>
+
+  <div class="block"><p class="blabel">The problem</p>
+    <p>Maya's class picnic is on Saturday and there's a lot to sort out. Dot can answer any single question she asks. But Maya has to think of every question herself, one at a time, and do all the actual work.</p></div>
+
+  <div class="block trick"><p class="blabel">Dot's new trick</p>
+    <p>Maya says one thing: <em>“Help me plan the class picnic on Saturday.”</em></p>
+    <p>Dot makes a plan and works through it: check Saturday's weather, find three parks nearby with shade, write a packing list for 25 children, draft an invitation for their families.</p>
+    <p>(The packing list includes bagels. Of course it does.)</p>
+    <p>Then Dot stops and shows Maya the invitation. <em>“Shall I send this?”</em> Because sending it is Maya's decision, not Dot's.</p></div>
+
+  <figure class="viz">
+    <svg viewBox="0 0 620 190" role="img" aria-labelledby="viz7t viz7d">
+      <title id="viz7t">An agent's workflow: goal, plan, tools, human approval, result</title>
+      <desc id="viz7d">Five stages connected by arrows: "Goal" from Maya, then "Plan" broken into steps, then "Tools" showing weather, maps and writing, then a highlighted stage "Maya approves" marked as required, and finally "Result". The approval stage sits between the tools and the result, showing a person must agree before anything is sent.</desc>
+      <rect class="svg-box" x="10" y="52" width="96" height="56" rx="10"/>
+      <text class="svg-tiny" x="58" y="44" text-anchor="middle">1 · GOAL</text>
+      <text class="svg-small" x="58" y="78" text-anchor="middle">“Plan the</text><text class="svg-small" x="58" y="94" text-anchor="middle">picnic”</text>
+      <path class="svg-arrow anim-flow" d="M110 80 L134 80" marker-end="url(#a7)"/>
+      <rect class="svg-box" x="138" y="52" width="96" height="56" rx="10"/>
+      <text class="svg-tiny" x="186" y="44" text-anchor="middle">2 · PLAN</text>
+      <text class="svg-small" x="186" y="76" text-anchor="middle">break into</text><text class="svg-small" x="186" y="92" text-anchor="middle">4 steps</text>
+      <path class="svg-arrow anim-flow" d="M238 80 L262 80" marker-end="url(#a7)"/>
+      <rect class="svg-box" x="266" y="42" width="106" height="76" rx="10"/>
+      <text class="svg-tiny" x="319" y="34" text-anchor="middle">3 · TOOLS</text>
+      <text class="svg-small" x="319" y="62" text-anchor="middle">weather</text><text class="svg-small" x="319" y="80" text-anchor="middle">maps</text><text class="svg-small" x="319" y="98" text-anchor="middle">writing</text>
+      <path class="svg-arrow anim-flow" d="M376 80 L400 80" marker-end="url(#a7)"/>
+      <rect x="404" y="42" width="106" height="76" rx="10" fill="rgba(255,138,110,0.18)" stroke="#FF8A6E" stroke-width="2.5"/>
+      <text class="svg-tiny" x="457" y="34" text-anchor="middle" fill="#FF8A6E">4 · MAYA APPROVES</text>
+      <text class="svg-small" x="457" y="66" text-anchor="middle" fill="var(--text)">“Shall I</text><text class="svg-small" x="457" y="82" text-anchor="middle" fill="var(--text)">send this?”</text>
+      <text class="svg-tiny" x="457" y="104" text-anchor="middle" fill="#FF8A6E">required</text>
+      <path class="svg-arrow" d="M514 80 L538 80" marker-end="url(#a7)"/>
+      <rect class="svg-box" x="542" y="52" width="68" height="56" rx="10"/>
+      <text class="svg-tiny" x="576" y="44" text-anchor="middle">5 · RESULT</text>
+      <text class="svg-small" x="576" y="86" text-anchor="middle">done</text>
+      <text class="svg-tiny" x="310" y="160" text-anchor="middle">A person decides before anything gets sent, bought, or deleted.</text>
+      <text class="svg-tiny" x="310" y="178" text-anchor="middle">Dot can still misunderstand the goal, get stuck, or use a tool wrongly.</text>
+      <defs><marker id="a7" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="5" markerHeight="5" orient="auto"><path d="M0 0 L10 5 L0 10 z" fill="var(--faint)"/></marker></defs>
+    </svg>
+    <figcaption>Goal → plan → tools → human approval → result. The fourth step is not optional.</figcaption>
+  </figure>
+
+  <div class="block"><p class="blabel">How it works</p>
+    <p>An <strong>agent</strong> is a model connected to a plan, a memory, and tools. The model decides what to do next. The tools — a weather service, a map, a calendar — let it actually do things.</p>
+    <p>The memory matters: it's how Dot remembers, at step four, what it found at step one.</p>
+    <p class="callback"><strong>Notice what's underneath.</strong> Dot needed <em>every</em> earlier trick for this. Rules to follow a plan. Examples and layers to read a map. Attention and prediction to write the invitation. Many senses to check the sky. Seven tricks, all working at once, to organise one picnic.</p></div>
+
+  <div class="block moment"><p class="blabel">Examples in 2026 <span class="asof">as of 17 July 2026</span></p>
+    <p>Several companies now sell agents of this kind, and no one of them is the finish line. OpenAI, Anthropic, Google, and Perplexity all ship agent products. As one dated example: Perplexity launched a product called <strong>Computer</strong> on <strong>25 February 2026</strong>, which routes different parts of a task to different AI models — reported at launch as 19 of them.</p>
+    <p style="margin-top:10px;font-size:.92rem;color:var(--faint)">How to read claims like these: “launched on this date” is verifiable. “Does the work of a whole team” is usually a <em>company's own claim</em>, and worth treating differently from an independent test. This field moves fast, so anything in this box may be out of date by the time you read it.</p></div>
+
+  <div class="block pair">
+    <div class="pair-card can"><h3><span class="badge">✓</span> What it could do</h3><p>Carry out long jobs with many steps, using real tools, without being told each step — which saves a great deal of tedious work.</p></div>
+    <div class="pair-card cant"><h3><span class="badge">✕</span> What it still got wrong</h3><p>Dot can misunderstand the goal, get stuck repeating itself, use a tool the wrong way, or finish confidently with a wrong answer. And a mistake now <em>does</em> something — a wrong email really gets sent. That's why step four exists.</p></div>
+  </div>
+
+  <div class="bridge"><p class="blabel">One last question</p>
+    <p>Dot has seven tricks now. So who decides what Dot should do — and who checks whether it got it right?</p></div>
+
+  <details class="more"><summary>Explore the real history</summary><div class="more-body">
+    <p>Giving a model tools is often called <strong>tool use</strong> or <strong>function calling</strong>. Letting it plan its own steps toward a goal makes it an <strong>agent</strong>. Some agents split work among smaller helpers, called <strong>sub-agents</strong>. Sending each part of a job to whichever model handles it best is <strong>orchestration</strong>.</p>
+    <p><strong>Dated product facts (17 July 2026):</strong> Perplexity launched Computer on 25 February 2026; press coverage at launch described it as orchestrating 19 AI models. A version for legal teams, Computer for Counsel, was announced 24 June 2026 and described as drawing on more than 20 models. These are launch facts reported by the press.</p>
+    <p><strong>Company claims vs. independent findings.</strong> Claims about how much work an agent replaces usually come from the companies selling them, and independent testing of agents is still early. Treat performance claims as claims until someone outside the company checks them.</p>
+    <p><strong>An open question from whoever built this page:</strong> if agents are being tailored for particular jobs — legal work was among the first — education seems like an interesting candidate. That's a personal hunch, not a prediction, and definitely not a fact. <a href="#references">See sources ↓</a></p>
+  </div></details>
+
+  <div class="chapter-foot"><button class="btn" type="button" data-nav="prev">← Back: Many senses</button><button class="btn" type="button" data-nav="next" disabled>End of the story</button></div>
+</article>
+
+<!-- ======================= WHERE THINGS STAND ======================= -->
+<section class="chapter" id="where-things-stand" aria-labelledby="h-stand">
+  <div class="chapter-head"><span class="chapter-num">After the story</span></div>
+  <h2 id="h-stand">Where things stand</h2>
+  <p style="color:var(--muted);max-width:62ch;margin-bottom:18px">Seven tricks in, here's an honest picture of what Dot — and every real AI system — can and can't do.</p>
+  <div class="grid2">
+    <div class="stand-card"><h3>What AI is good at</h3><ul>
+      <li>Spotting patterns in huge piles of data</li><li>Producing a first draft of almost anything</li>
+      <li>Doing repetitive work without getting bored</li><li>Working in many languages at once</li>
+      <li>Being available at 3am when you're stuck</li></ul></div>
+    <div class="stand-card"><h3>What AI still gets wrong</h3><ul>
+      <li>Inventing facts that sound convincing</li><li>Repeating unfairness that was in its examples</li>
+      <li>Sounding equally confident when right and wrong</li><li>Missing context nobody wrote down</li>
+      <li>Failing in ways that surprise its own builders</li></ul></div>
+    <div class="stand-card"><h3>Why humans still matter</h3><ul>
+      <li>People choose the goal — Dot never picks the picnic</li>
+      <li>People check the work, because Dot can't tell when it's wrong</li>
+      <li>People taught it what “good” means in the first place</li>
+      <li>People carry responsibility when something goes badly</li>
+      <li>People decide what <em>shouldn't</em> be built at all</li></ul></div>
+    <div class="stand-card"><h3>What AI costs</h3><ul>
+      <li><strong>Computers:</strong> thousands of specialised chips</li>
+      <li><strong>Electricity:</strong> a lot — data centres and their power use are now a live public debate</li>
+      <li><strong>Data:</strong> huge amounts of text and images, raising real questions about who made it and who agreed</li>
+      <li><strong>Human work:</strong> people label examples, rate answers, and review harmful content — often invisibly, as you saw in chapter 5</li></ul></div>
+  </div>
+  <details class="more"><summary>Industry snapshot (business context)</summary><div class="more-body">
+    <p>This part changes fastest and matters least for understanding how AI works — which is why it's tucked away here.</p>
+    <p><strong>As of mid-2026,</strong> several AI companies carry valuations in the hundreds of billions of dollars, and large sums are being invested in data centres and chips. Exact figures move constantly and are often reported second-hand, so this page deliberately doesn't list them. For current numbers, go to a primary source — a company's own announcement or a regulatory filing — and check the date on it.</p>
+    <p>Be especially wary of market-size projections for years like 2030 or 2034. They are estimates produced by firms that sell reports, they vary wildly between firms, and they are not facts.</p>
+    <p>One genuine debate: whether AI keeps improving mainly by making models bigger, or whether new ideas are needed. Serious researchers disagree. Anyone who tells you it's settled is selling something.</p>
+  </div></details>
+</section>
+
+<!-- ======================= QUIZ ======================= -->
+<section class="chapter" id="quiz" aria-labelledby="h-quiz">
+  <div class="chapter-head"><span class="chapter-num">Check yourself</span></div>
+  <h2 id="h-quiz">Seven questions</h2>
+  <p style="color:var(--muted);max-width:62ch;margin-bottom:18px">No names, no dates, no numbers. These ask whether the <em>ideas</em> landed. Pick an answer to see why.</p>
+
+  <div class="quiz-item"><p class="quiz-q"><span class="qn">1.</span> Why did one bagel defeat a program with 2,500 carefully written rules?</p>
+    <div class="quiz-opts">
+      <button class="opt" type="button" data-correct="false">Because bagels are harder to toast than bread</button>
+      <button class="opt" type="button" data-correct="true">Because rules only cover what someone thought of in advance, and the world keeps producing surprises</button>
+      <button class="opt" type="button" data-correct="false">Because the computer was too slow</button>
+    </div>
+    <p class="quiz-fb" hidden>Exactly. It's not that bagels are hard — it's that nobody can list every situation ahead of time. That wall is what pushed people toward learning from examples.</p></div>
+
+  <div class="quiz-item"><p class="quiz-q"><span class="qn">2.</span> Every dog photo Dot trains on happens to have grass in it. What might go wrong?</p>
+    <div class="quiz-opts">
+      <button class="opt" type="button" data-correct="false">Dot will refuse to look at photos with grass</button>
+      <button class="opt" type="button" data-correct="true">Dot may learn that grass means dog, and call an empty lawn a dog</button>
+      <button class="opt" type="button" data-correct="false">Nothing — more photos is always better</button>
+    </div>
+    <p class="quiz-fb" hidden>You made this happen yourself in chapter 2. Dot learns whatever the examples actually share — not what you meant them to share. This is why unbalanced training data is serious, especially when models make decisions about people.</p></div>
+
+  <div class="quiz-item"><p class="quiz-q"><span class="qn">3.</span> In a layered system that recognises pictures, what do the <em>early</em> layers notice?</p>
+    <div class="quiz-opts">
+      <button class="opt" type="button" data-correct="false">Whole objects, like a cat or a bus</button>
+      <button class="opt" type="button" data-correct="true">Tiny things — edges, corners, patches of colour</button>
+      <button class="opt" type="button" data-correct="false">The name of the photographer</button>
+    </div>
+    <p class="quiz-fb" hidden>Early layers catch the small stuff. Middle layers build those into shapes. Later layers assemble shapes into an object. Like the detectives: nobody does the whole job, but the team gets there.</p></div>
+
+  <div class="quiz-item"><p class="quiz-q"><span class="qn">4.</span> In “The dog chased the ball because it was rolling,” what does attention help the model compare?</p>
+    <div class="quiz-opts">
+      <button class="opt" type="button" data-correct="false">The spelling of every word</button>
+      <button class="opt" type="button" data-correct="true">The word “it” against the other words, to work out which one it refers to</button>
+      <button class="opt" type="button" data-correct="false">The length of the sentence</button>
+    </div>
+    <p class="quiz-fb" hidden>Attention scores how much each word matters to each other word. “It” links strongly to “ball,” because balls roll. Distance in the sentence stops being a barrier.</p></div>
+
+  <div class="quiz-item"><p class="quiz-q"><span class="qn">5.</span> Why can a language model state a fact that isn't true?</p>
+    <div class="quiz-opts">
+      <button class="opt" type="button" data-correct="false">Because it's trying to trick you</button>
+      <button class="opt" type="button" data-correct="true">Because it predicts what's <em>likely</em> to come next, and likely-sounding isn't the same as true</button>
+      <button class="opt" type="button" data-correct="false">Because it ran out of memory</button>
+    </div>
+    <p class="quiz-fb" hidden>This is the big one — remember Johann Kessler and his bagel. The model builds text one likely piece at a time. It isn't checking a fact, it's producing a plausible continuation. Usually plausible and true match. Sometimes they don't, and it sounds just as confident either way.</p></div>
+
+  <div class="quiz-item"><p class="quiz-q"><span class="qn">6.</span> A model 100 times smaller gave answers people preferred. What made the difference?</p>
+    <div class="quiz-opts">
+      <button class="opt" type="button" data-correct="false">It was newer, so it had fresher facts</button>
+      <button class="opt" type="button" data-correct="true">People rated its answers and taught it what a helpful answer looks like</button>
+      <button class="opt" type="button" data-correct="false">It ran on faster computers</button>
+    </div>
+    <p class="quiz-fb" hidden>Human feedback beat being 100× bigger. Every chatbot you've used was shaped by people patiently comparing answers and saying which was better. Humans aren't outside the machine — they're inside the training loop.</p></div>
+
+  <div class="quiz-item"><p class="quiz-q"><span class="qn">7.</span> Dot has drafted an invitation. Why should it ask Maya before sending it?</p>
+    <div class="quiz-opts">
+      <button class="opt" type="button" data-correct="false">Because Dot isn't allowed to use the internet</button>
+      <button class="opt" type="button" data-correct="true">Because Dot can misunderstand the goal or be wrong, and a sent email can't be unsent</button>
+      <button class="opt" type="button" data-correct="false">Because sending emails is too hard for Dot</button>
+    </div>
+    <p class="quiz-fb" hidden>Once an agent can act, its mistakes stop being just words on a screen. Sending, buying, and deleting are hard to undo — so a person checks first. Maya chose the picnic, and Maya decides what goes out.</p></div>
+</section>
+
+<!-- ======================= REFERENCES ======================= -->
+<section class="chapter" id="references" aria-labelledby="h-refs">
+  <div class="chapter-head"><span class="chapter-num">Sources</span></div>
+  <h2 id="h-refs">Where these facts came from</h2>
+  <p style="color:var(--muted);max-width:62ch;margin-bottom:16px">Checking sources is the whole point of chapter 5. So here are ours. Where a number is an outside estimate rather than a confirmed figure, it says so.</p>
+  <div class="refs"><ol>
+    <li><strong>XCON / R1 expert system</strong> — J. McDermott, “R1: A Rule-Based Configurer of Computer Systems,” <em>Artificial Intelligence</em> 19(1), 1982. Overview: <a href="https://en.wikipedia.org/wiki/Xcon">Xcon</a>. <em>Savings figures are widely reported estimates and vary by source.</em></li>
+    <li><strong>Dartmouth workshop, 1956</strong> — <a href="https://en.wikipedia.org/wiki/Dartmouth_workshop">Dartmouth workshop</a>.</li>
+    <li><strong>MNIST, 60,000 training images</strong> — <a href="https://yann.lecun.org/exdb/mnist/index.html">The MNIST Database of Handwritten Digits</a> (LeCun, Cortes, Burges).</li>
+    <li><strong>LeNet / handwritten digit recognition</strong> — Y. LeCun, L. Bottou, Y. Bengio, P. Haffner, “Gradient-Based Learning Applied to Document Recognition,” <em>Proceedings of the IEEE</em> 86(11), 1998.</li>
+    <li><strong>Deep Blue was not primarily a learning system</strong> — <a href="https://en.wikipedia.org/wiki/Deep_Blue_(chess_computer)">Deep Blue</a>: custom hardware, search, and hand-tuned evaluation developed with human grandmasters.</li>
+    <li><strong>ImageNet</strong> — J. Deng, W. Dong, R. Socher, L.-J. Li, K. Li, L. Fei-Fei, “ImageNet: A Large-Scale Hierarchical Image Database,” CVPR 2009.</li>
+    <li><strong>AlexNet, 15.3% top-5 error</strong> — A. Krizhevsky, I. Sutskever, G. Hinton, “ImageNet Classification with Deep Convolutional Neural Networks,” NeurIPS 2012.</li>
+    <li><strong>Perceptron and its 1969 critique</strong> — F. Rosenblatt (1958); M. Minsky &amp; S. Papert, <em>Perceptrons</em> (1969). Overview: <a href="https://en.wikipedia.org/wiki/Perceptron">Perceptron</a>.</li>
+    <li><strong>Transformers; attention cost grows with the square of length</strong> — A. Vaswani et al., “Attention Is All You Need,” 2017. <a href="https://arxiv.org/abs/1706.03762">arXiv:1706.03762</a>.</li>
+    <li><strong>GPT-3, 175 billion parameters</strong> — T. Brown et al., “Language Models are Few-Shot Learners,” 2020. <a href="https://arxiv.org/abs/2005.14165">arXiv:2005.14165</a>.</li>
+    <li><strong>Human feedback (RLHF); 1.3B InstructGPT preferred over 175B GPT-3</strong> — L. Ouyang et al., “Training Language Models to Follow Instructions with Human Feedback,” 2022. <a href="https://arxiv.org/abs/2203.02155">arXiv:2203.02155</a>; <a href="https://openai.com/index/instruction-following/">OpenAI, “Aligning language models to follow instructions.”</a></li>
+    <li><strong>ChatGPT launch, 30 Nov 2022</strong> — <a href="https://openai.com/index/chatgpt/">OpenAI, “Introducing ChatGPT”</a> (describes ChatGPT as a sibling model to InstructGPT).</li>
+    <li><strong>“100 million users in two months”</strong> — Reuters, February 2023, reporting a <em>UBS estimate</em>. An outside estimate, not an audited company figure. <a href="https://www.reuters.com/technology/chatgpt-sets-record-fastest-growing-user-base-analyst-note-2023-02-01/">Reuters</a>.</li>
+    <li><strong>GPT-4, March 2023, image + text input</strong> — <a href="https://openai.com/index/gpt-4-research/">OpenAI, “GPT-4.”</a></li>
+    <li><strong>Nobel Prize in Physics 2024</strong> — John Hopfield and Geoffrey Hinton. <a href="https://www.nobelprize.org/prizes/physics/2024/summary/">NobelPrize.org</a>.</li>
+    <li><strong>Perplexity Computer, launched 25 Feb 2026, ~19 models</strong> <span class="asof">checked 17 Jul 2026</span> — <a href="https://www.semafor.com/article/02/25/2026/perplexity-launches-computer-super-agent">Semafor</a>; <a href="https://venturebeat.com/technology/perplexity-takes-its-computer-ai-agent-into-the-enterprise-taking-aim-at">VentureBeat</a>.</li>
+    <li><strong>Computer for Counsel, announced 24 Jun 2026</strong> <span class="asof">checked 17 Jul 2026</span> — <a href="https://pulse2.com/perplexity-launches-computer-for-counsel-for-legal-teams/">Pulse 2.0</a>. <em>Model counts as described by the company at announcement.</em></li>
+  </ol></div>
+</section>
+
+</main>
+
+<!-- ======================= FOOTER ======================= -->
+<footer class="end">
+  <p class="concl">AI did not learn one magical trick. It gained a toolbox: instructions, examples, layers, attention, generation, many kinds of input, and tools for taking action. Each new ability made AI more useful — but people still choose the goals, check the work, and decide what should happen next.</p>
+  <p class="concl" style="margin-top:14px;color:var(--muted)">It started with a bagel that a very clever machine could not toast. Seven tricks later, Dot can plan a picnic — and still needs Maya to say yes.</p>
+
+  <div class="final-box">
+    <h2 id="h-final">If you could give Dot one new ability, what would it be — and what safety rule would you add?</h2>
+    <label class="visually-hidden" for="final-answer">Your answer</label>
+    <textarea id="final-answer" placeholder="Dot's eighth trick would be…&#10;&#10;And the rule I'd add is…"></textarea>
+    <div class="print-answer" id="print-answer" aria-hidden="true"></div>
+    <div class="row">
+      <button type="button" id="print-btn">Print my answer</button>
+      <button type="button" class="ghost" id="clear-btn">Clear</button>
+    </div>
+    <p style="margin-top:12px;font-size:.86rem;color:var(--faint)">Nothing here is saved or sent anywhere — it stays in your browser. Print it, stick it on a wall, argue about it with someone.</p>
+  </div>
+
+  <p class="credit">Written for curious people of any age. Maya and Dot are imaginary; the history is real, and the sources are listed above. Last checked 17 July 2026.</p>
+</footer>
+
+</div><!-- /.wrap -->
+
 <script>
-const PHASES = [
-  {
-    num:"01", name:"We write the rules", years:"1950s–1980s", c:"#6E8FE0",
-    viz:"a handful of rigid rules",
-    eli:"Imagine teaching a kid to cook by handing them an exact recipe: \u201cif the water bubbles, add the pasta.\u201d The computer does only what a human typed in.",
-    body:"This was the era of \u201cexpert systems\u201d \u2014 a specialist\u2019s knowledge written down as thousands of if-then rules. It shone on narrow problems but shattered the moment reality got messy, because you can\u2019t write a rule for everything.",
-    story:"In the summer of 1956, a small group gathered at <b>Dartmouth College</b> and coined a new phrase: <i>artificial intelligence</i>. <b>John McCarthy</b>, <b>Marvin Minsky</b> and others believed human expertise could simply be written down as rules. The poster child came two decades later: in 1978, <b>John McDermott</b> at Carnegie Mellon built <b>XCON</b> for Digital Equipment Corporation \u2014 about 2,500 hand-written rules that configured VAX computers, processed 80,000 orders, and saved DEC an estimated $25 million a year. Governments piled in: Japan bet roughly $400 million on a \u201cFifth Generation\u201d project (1982\u20131992) to leap ahead of America. But the rules were brittle \u2014 every new case needed another rule, until the systems became unmaintainable \u201crat\u2019s nests.\u201d When the specialized-hardware market collapsed in the late 1980s and Japan\u2019s project ended in 1992 with no commercial payoff, the funding evaporated. Researchers had a name for these busts: the <b>AI winter</b>.",
-    cast:[["John McCarthy","coined \u201cAI,\u201d Dartmouth 1956"],["Marvin Minsky","AI founding figure"],["Edward Feigenbaum","\u201cfather of expert systems\u201d"],["John McDermott","built XCON for DEC, 1978"]],
-    stats:[{n:1956,label:"\u201cAI\u201d coined at Dartmouth"},{n:2500,label:"hand-written rules in XCON"},{n:25,pre:"$",suf:"M/yr",label:"XCON saved DEC"},{n:400,pre:"~$",suf:"M",label:"Japan\u2019s Fifth-Gen bet"}],
-    mk:"Where it began",
-    moment:"1956 \u00b7 The term \u201cartificial intelligence\u201d is coined at a summer workshop at Dartmouth College.",
-    uses:["DENDRAL (1965) \u2014 identified molecules from chemical data, the first true expert system","MYCIN \u2014 diagnosed bacterial infections better than some doctors, but was never deployed over liability fears","XCON \u2014 configured DEC\u2019s computers from ~2,500 rules"],
-    pills:[["Expert system","a program that copies a specialist by storing their knowledge as fixed if-then rules."],["AI winter","a stretch where hype outran results and the research money dried up."],["Knowledge engineer","the person whose job was to extract an expert\u2019s know-how and turn it into rules."]]
-  },
-  {
-    num:"02", name:"We show examples", years:"1990s–2000s", c:"#4FC2C9",
-    viz:"patterns learned from data",
-    eli:"Now, instead of the recipe, you let the kid watch you cook 500 times until they spot the pattern themselves.",
-    body:"That\u2019s machine learning: feed the machine piles of examples and it finds the pattern on its own. You don\u2019t define spam \u2014 you show it 10,000 spam emails and it learns the difference.",
-    story:"The fix was to stop writing rules and let machines learn from examples \u2014 and the drama played out on a chessboard. On <b>May 11, 1997</b>, IBM\u2019s <b>Deep Blue</b>, built by engineers <b>Feng-hsiung Hsu</b> and <b>Murray Campbell</b>, beat reigning world champion <b>Garry Kasparov</b> 3.5\u20132.5. Kasparov had crushed the same machine a year earlier; this time he was so rattled by one uncanny move that he accused IBM of cheating. IBM simply dismantled the machine and never granted a rematch. Away from the headlines, quieter machine learning was already woven into daily life \u2014 filtering spam, flagging credit-card fraud, and powering <b>Amazon\u2019s</b> \u201cyou might also like\u201d recommendations.",
-    cast:[["Garry Kasparov","world champion who lost"],["Feng-hsiung Hsu","Deep Blue\u2019s chief architect"],["Murray Campbell","IBM Deep Blue team"]],
-    stats:[{n:1997,label:"Deep Blue beats Kasparov"},{n:3.5,dec:1,suf:"\u20132.5",label:"final match score"},{n:200,suf:"M",label:"chess positions/sec searched"}],
-    mk:"Landmark moment",
-    moment:"May 11, 1997 \u00b7 IBM\u2019s Deep Blue becomes the first machine to beat a reigning world chess champion in a match.",
-    uses:["Spam filters that learn from millions of flagged emails","Credit-card fraud detection","\u201cCustomers who bought this also bought\u2026\u201d recommendations"],
-    pills:[["Machine learning","the machine learns patterns from examples instead of being handed rules."],["Training data","the pile of examples a model studies in order to learn."]]
-  },
-  {
-    num:"03", name:"A bigger, brain-like machine", years:"2012", c:"#5BD49B",
-    viz:"layered networks that can see",
-    eli:"The big leap: build the machine out of many simple parts loosely inspired by brain cells, stacked in deep layers.",
-    body:"These \u201cneural networks,\u201d stacked deep, gave us deep learning. Suddenly computers could see \u2014 reliably telling a cat from a dog \u2014 something earlier methods never cracked.",
-    story:"The brain-inspired idea had been declared dead once already. <b>Frank Rosenblatt\u2019s</b> 1958 Perceptron was hyped by the New York Times as a machine that would soon \u201cwalk, talk, see, write\u201d \u2014 then <b>Marvin Minsky</b> and Seymour Papert\u2019s 1969 book exposed its limits, funding collapsed, and Rosenblatt died in a boating accident in 1971. It roared back fifty years later. In 2009, Stanford\u2019s <b>Fei-Fei Li</b> built <b>ImageNet</b>, a dataset of millions of labeled photos. In 2012, three researchers \u2014 grad student <b>Alex Krizhevsky</b> with <b>Ilya Sutskever</b> and advisor <b>Geoffrey Hinton</b> at Toronto \u2014 entered \u201cAlexNet,\u201d trained on cheap gaming GPUs, and slashed the image-recognition error rate to 15.3%, humiliating the runner-up near 26%. Four years on, <b>DeepMind\u2019s</b> AlphaGo beat Go legend <b>Lee Sedol</b> 4\u20131 before 200M+ viewers; its \u201cMove 37\u201d was so strange that experts first assumed it was a bug.",
-    cast:[["Frank Rosenblatt","Perceptron, 1958 (d. 1971)"],["Geoffrey Hinton","\u201cgodfather of deep learning,\u201d Nobel 2024"],["Fei-Fei Li","built ImageNet, 2009"],["Demis Hassabis","DeepMind / AlphaGo"]],
-    stats:[{n:1958,label:"Rosenblatt\u2019s Perceptron"},{n:2012,label:"AlexNet breakthrough"},{n:15.3,dec:1,suf:"%",label:"AlexNet error (vs ~26%)"},{n:4,suf:"\u20131",label:"AlphaGo over Lee Sedol"}],
-    mk:"Two breakthroughs",
-    moment:"2012 \u00b7 AlexNet wins ImageNet and computers can finally \u201csee.\u201d  2016 \u00b7 AlphaGo beats the world\u2019s best Go player.",
-    uses:["Face unlock on your phone","Automatic photo tagging","Voice assistants \u2014 Siri, Alexa"],
-    pills:[["Neural network","a web of simple units, loosely inspired by brain cells, that learn together."],["Deep learning","stacking those networks many layers deep so they can learn complex things."],["GPU","gaming graphics chips that turned out to be perfect for training neural nets fast."]]
-  },
-  {
-    num:"04", name:"A better way to pay attention", years:"2017", c:"#C7D45B",
-    viz:"attention weighing every word",
-    eli:"The quiet hero of the whole story. The machine gets a new trick: weigh which words in a sentence matter most to each other \u2014 all at once, instead of plodding word by word.",
-    body:"This design is called the Transformer. Boring name, world-changing idea. Every tool you use today \u2014 ChatGPT, Claude, Gemini \u2014 is built on it.",
-    story:"In June 2017, eight researchers at <b>Google</b> published a paper with a cheeky title: <b>\u201cAttention Is All You Need.\u201d</b> Led by <b>Ashish Vaswani</b>, with <b>Noam Shazeer</b> and six others, they introduced the <b>Transformer</b> \u2014 a design that reads a whole sentence at once and weighs which words matter to each other, instead of crawling through one at a time. Inside Google it was almost a side project; few grasped how big it would become. Within a few years, all eight authors had left to start their own AI companies. The payoff is hiding in plain sight: the \u201cGPT\u201d in ChatGPT literally stands for Generative Pretrained <b>Transformer</b>.",
-    cast:[["Ashish Vaswani","lead author of the Transformer"],["Noam Shazeer","co-author (later Character.AI)"],["+ 6 others","all later left Google to found startups"]],
-    stats:[{n:2017,label:"\u201cAttention Is All You Need\u201d"},{n:8,label:"authors on the paper"},{text:"~100%",label:"of today\u2019s top models use it"}],
-    mk:"The paper that changed AI",
-    moment:"June 2017 \u00b7 A Google paper titled \u201cAttention Is All You Need\u201d introduces the Transformer.",
-    uses:["It\u2019s the engine under essentially every modern AI you\u2019ve heard of","Powers translation, search, and chatbots alike"],
-    pills:[["Transformer","the model design behind today\u2019s AI; reads a whole sentence at once."],["Attention","the mechanism that decides which words matter most to each other."]]
-  },
-  {
-    num:"05", name:"It starts to create", years:"2020–2022", c:"#F0C24B",
-    viz:"generating words, code, ideas",
-    eli:"Earlier AI mostly sorted things into buckets (\u201cspam / not spam\u201d). Now it can make new things \u2014 write, summarize, and code.",
-    body:"Trained on a huge slice of the internet, these models went from classifying to creating. The public earthquake was ChatGPT \u2014 the tech existed before, but suddenly anyone could just talk to it.",
-    story:"<b>OpenAI</b> scaled the Transformer up relentlessly. GPT-1 (2018) had 117 million \u201cparameters\u201d; <b>GPT-3</b> (2020) had 175 <i>billion</i>, trained on much of the public internet. Then on <b>November 30, 2022</b>, OpenAI quietly shipped <b>ChatGPT</b> as a \u201cresearch preview\u201d \u2014 something they expected to be minor. It reached 1 million users in five days and 100 million in two months, the fastest-growing consumer app in history at the time. CEO <b>Sam Altman</b> later admitted the team braced for a fraction of that. Almost overnight, your grandparent and your CEO were using the same tool.",
-    cast:[["Sam Altman","OpenAI CEO"],["Ilya Sutskever","OpenAI chief scientist (also AlexNet)"]],
-    stats:[{n:175,suf:"B",label:"GPT-3 parameters"},{n:5,suf:" days",label:"ChatGPT to 1M users"},{n:100,suf:"M",label:"users in 2 months"}],
-    mk:"AI\u2019s iPhone moment",
-    moment:"Nov 30, 2022 \u00b7 ChatGPT launches and reaches 100 million users within two months.",
-    uses:["Drafting emails and documents","Writing and debugging code","First drafts of almost anything"],
-    pills:[["Generative AI","AI that makes new content \u2014 text, images, code \u2014 rather than just sorting."],["LLM","\u201clarge language model\u201d; trained on massive text to predict and produce language."],["Parameters","the internal dials a model tunes while learning; more can mean more capability."],["Prompt","the instruction you give the model to steer what it makes."]]
-  },
-  {
-    num:"06", name:"It sees, hears & speaks together", years:"2023–2025", c:"#F09B4B",
-    viz:"one system, every sense",
-    eli:"One system that handles text, images, audio, and video together \u2014 you can show it a photo, or just talk to it out loud.",
-    body:"This is the multimodal era. The model stops being text-only and starts taking in the world more like a person does.",
-    story:"Models learned to see, hear, and speak. <b>OpenAI\u2019s GPT-4</b> (March 2023), <b>Anthropic\u2019s Claude</b>, and <b>Google\u2019s Gemini</b> could read a photo, analyze a chart, or hold a spoken conversation. In a fitting twist, in 2024 <b>Geoffrey Hinton</b> \u2014 who had quit Google in 2023 to warn the public about AI\u2019s risks \u2014 shared the <b>Nobel Prize in Physics</b> for the neural-network foundations he\u2019d laid decades earlier. In barely a year, AI moved from a curiosity to the center of the world economy.",
-    cast:[["Geoffrey Hinton","left Google 2023 to warn on AI; Nobel 2024"],["The big labs","OpenAI, Anthropic, Google in a dead heat"]],
-    stats:[{n:2023,label:"GPT-4 goes multimodal"},{n:2024,label:"Hinton wins Nobel Physics"}],
-    mk:"The everyday era",
-    moment:"2023\u20132025 \u00b7 Models become multimodal and move from novelty into daily tools for hundreds of millions.",
-    uses:["\u201cPhoto of my fridge \u2192 suggest dinner\u201d","Live spoken tutoring","Upload a chart and ask about it"],
-    pills:[["Multimodal","a model that understands more than one kind of input \u2014 text, image, audio, video."],["Token","the small chunks of text a model reads and writes; how its work is measured and priced."],["Context window","how much the model can \u201chold in mind\u201d at once \u2014 its working memory."]]
-  },
-  {
-    num:"07", name:"It stops answering and starts doing", years:"2025–2026 · now", c:"#F0664B",
-    viz:"agents delegating real work",
-    eli:"The shift happening right now: from answers to actions. Instead of telling you how to do a task, the AI does it.",
-    body:"This is agentic AI. The model breaks a goal into steps, spins up little helper \u201csub-agents,\u201d uses real tools (a browser, your files, code), and keeps going until the job is done.",
-    story:"The frontier shifted from <i>answering</i> to <i>doing</i>. In February 2026, <b>Perplexity</b> \u2014 led by 31-year-old CEO <b>Aravind Srinivas</b>, an IIT Madras grad \u2014 launched <b>Computer</b>, a system that orchestrates around 20 different AI models, handing each subtask to whichever model is best (the company\u2019s data showed no single model held even 25% of usage). Within three months it reportedly performed billions of dollars of \u201clabor-equivalent\u201d work, and Perplexity began shipping industry-specific versions \u2014 starting with <b>Computer for Counsel</b> for lawyers in June 2026. The defining question of this era isn\u2019t which single model is smartest, but who can orchestrate them all \u2014 cheaply, measured in \u201ctoken value per watt.\u201d",
-    cast:[["Aravind Srinivas","Perplexity CEO, IIT Madras"]],
-    stats:[{n:2026,label:"Perplexity launches Computer"},{n:20,suf:"+",label:"AI models orchestrated"},{n:20,pre:"$",suf:"B",label:"Perplexity valuation"}],
-    mk:"Where we are today",
-    moment:"Feb 2026 \u00b7 Perplexity launches Computer; it runs workflows for hours or days, picking the best model per subtask.",
-    uses:["Research \u2192 finished report, deck, or dashboard, hands-free","Long-running workflows that run for hours","Industry layers like Computer for Counsel (legal) \u2014 Education next?"],
-    pills:[["Agent","AI that takes actions toward a goal, not just answers a question."],["Sub-agent","a smaller helper the main agent spins up to handle one piece of the job."],["Orchestration","routing each task to whichever model or tool is best for it."]]
+/* ============================================================
+   CHAPTER SWITCHER
+   Progressive enhancement: without JS every chapter is already
+   in the HTML and visible, so the story still reads top to bottom.
+   ============================================================ */
+(function () {
+  'use strict';
+  var chapters = [].slice.call(document.querySelectorAll('.chapter[id^="chapter-"]'));
+  var chips    = [].slice.call(document.querySelectorAll('.chip'));
+  var live     = document.getElementById('live-region');
+  var ids      = chapters.map(function (c) { return c.id; });
+
+  /* URL hashes are a nice-to-have, not a requirement.
+     Some contexts have no real URL to write to — a sandboxed
+     `about:srcdoc` iframe, for example — and pushState throws a
+     SecurityError there. Chapter switching must keep working
+     regardless, so every history call is guarded. */
+  var canHistory = true;
+  function setHash(id) {
+    if (!canHistory) return;
+    try {
+      if (location.hash !== '#' + id) history.pushState(null, '', '#' + id);
+    } catch (err) {
+      canHistory = false;   // stop trying; everything else still works
+    }
   }
-];
-
-const FORCES = [
-  ["The surprise of 2026","Models are specializing, not commoditizing","There\u2019s no single \u201cbest AI.\u201d Different models win at different jobs \u2014 which is exactly why orchestration (picking the right model per task) is the bet to watch."],
-  ["The real bottleneck","Energy, not just intelligence","Running these models is hugely power-hungry. Some leaders now chase \u201ctoken value per watt\u201d \u2014 most useful work per unit of electricity. The AI race is quietly an energy race."],
-  ["The stakes","Valuations in the hundreds of billions","Anthropic and OpenAI sit near or above $850B\u2013$1T; Perplexity is valued around $20B. The agentic-AI market is projected to grow roughly 15x this decade."],
-  ["The open debate","Just scale up, or do we need new ideas?","Does AI keep getting smarter simply by going bigger (more data, more compute), or are we hitting limits that need fresh breakthroughs? Genuinely unsettled."]
-];
-
-const CARDS = [
-  ["What\u2019s the one idea behind all of AI?","Stop writing the rules yourself \u2014 let the machine figure them out. Every phase is that idea at a bigger scale."],
-  ["Who built XCON, and why did it matter?","John McDermott (CMU, 1978). Its ~2,500 rules saved DEC ~$25M/yr \u2014 proof expert systems could pay off \u2014 but its brittleness foreshadowed the AI winter."],
-  ["What killed the first neural-network wave?","Minsky & Papert\u2019s 1969 book showed the single-layer Perceptron\u2019s limits. Funding dried up for ~15 years until backpropagation revived it."],
-  ["What does the \u201cT\u201d in GPT stand for \u2014 and where\u2019s it from?","Transformer \u2014 the 2017 Google paper \u201cAttention Is All You Need,\u201d which nearly every modern AI is built on."],
-  ["What made late 2022 AI\u2019s \u201ciPhone moment\u201d?","ChatGPT \u2014 the tech existed before, but anyone could suddenly just talk to it. 100M users in two months."],
-  ["Why does Perplexity bet on \u201corchestration\u201d?","Because no single model is best at everything \u2014 so route each task to whichever one wins, and compete on token-value-per-watt."]
-];
-
-let idx=0, cardIdx=0;
-const $ = id => document.getElementById(id);
-const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-
-const rail=$('rail');
-PHASES.forEach((p,i)=>{
-  const el=document.createElement('div');
-  el.className='chip'; el.style.setProperty('--c',p.c);
-  el.innerHTML=`<div class="num">PHASE ${p.num}</div><div class="nm">${p.name.split(' ').slice(0,3).join(' ')}</div><div class="yr">${p.years}</div>`;
-  el.onclick=()=>select(i,true);
-  rail.appendChild(el);
-});
-
-const forces=$('forces');
-FORCES.forEach(f=>{
-  const el=document.createElement('div'); el.className='force';
-  el.innerHTML=`<div class="n">${f[0]}</div><div class="t">${f[1]}</div><div class="d">${f[2]}</div>`;
-  forces.appendChild(el);
-});
-
-function hexA(hex,a){const n=parseInt(hex.slice(1),16);return `rgba(${(n>>16)&255},${(n>>8)&255},${n&255},${a})`;}
-
-function animateNum(el,target,pre,suf,dec){
-  pre=pre||''; suf=suf||''; dec=dec||0;
-  const fin = pre + (dec? target.toFixed(dec) : target) + suf;
-  if(reduce){ el.textContent=fin; return; }
-  const dur=950, t0=performance.now();
-  (function step(now){
-    const p=Math.min(1,(now-t0)/dur), e=1-Math.pow(1-p,3), v=target*e;
-    el.textContent = pre + (dec? v.toFixed(dec) : Math.round(v)) + suf;
-    if(p<1) requestAnimationFrame(step); else el.textContent=fin;
-  })(t0);
-}
-
-function select(i, scroll){
-  idx=i; const p=PHASES[i];
-  document.documentElement.style.setProperty('--accent',p.c);
-  document.documentElement.style.setProperty('--accent-soft',hexA(p.c,0.16));
-  $('eyebrow').style.color=p.c;
-
-  const content=$('d-content');
-  content.classList.add('swap');
-
-  setTimeout(()=>{
-    $('d-num').textContent='PHASE '+p.num;
-    $('d-name').textContent=p.name;
-    $('d-years').textContent=p.years;
-    $('d-eli').textContent=p.eli;
-    $('d-body').textContent=p.body;
-    $('d-story').innerHTML=p.story;
-    $('d-mk').textContent=p.mk;
-    $('d-moment').textContent=p.moment;
-    $('vizlabel').textContent=p.viz;
-
-    const cast=$('d-cast'); cast.innerHTML='';
-    p.cast.forEach(([nm,rl])=>{
-      const d=document.createElement('div'); d.className='person';
-      d.innerHTML=`<div class="nm">${nm}</div><div class="rl">${rl}</div>`;
-      cast.appendChild(d);
-    });
-
-    const st=$('d-stats'); st.innerHTML='';
-    p.stats.forEach((s,k)=>{
-      const c=document.createElement('div'); c.className='stat'; c.style.animationDelay=(k*70)+'ms';
-      const n=document.createElement('div'); n.className='stat-n';
-      const l=document.createElement('div'); l.className='stat-l'; l.textContent=s.label;
-      c.appendChild(n); c.appendChild(l); st.appendChild(c);
-      if(s.n!==undefined) animateNum(n,s.n,s.pre,s.suf,s.dec); else n.textContent=s.text;
-    });
-
-    const u=$('d-uses'); u.innerHTML='';
-    p.uses.forEach(x=>{ const li=document.createElement('li'); li.textContent=x; u.appendChild(li); });
-
-    const pl=$('d-pills'); pl.innerHTML='';
-    p.pills.forEach(([t,d])=>{
-      const b=document.createElement('button'); b.className='pill';
-      b.innerHTML=`<span class="term">${t}</span><span class="def"> ${d}</span>`;
-      b.onclick=()=>{ b.dataset.open = b.dataset.open==='true'?'false':'true'; };
-      pl.appendChild(b);
-    });
-
-    content.classList.remove('swap');
-  }, reduce?0:200);
-
-  [...rail.children].forEach((c,ci)=>c.dataset.active=(ci===i)?'true':'false');
-  if(scroll) rail.children[i].scrollIntoView({behavior:'smooth',inline:'center',block:'nearest'});
-  $('prev').disabled=i===0; $('next').disabled=i===PHASES.length-1;
-  configureViz(i);
-}
-$('prev').onclick=()=>{ if(idx>0) select(idx-1,true); };
-$('next').onclick=()=>{ if(idx<PHASES.length-1) select(idx+1,true); };
-
-function renderCard(){
-  $('q').textContent=CARDS[cardIdx][0];
-  $('a').textContent=CARDS[cardIdx][1];
-  $('qn').textContent='Question '+(cardIdx+1);
-  $('ccount').textContent=(cardIdx+1)+' / '+CARDS.length;
-  $('card').dataset.flip='false';
-}
-$('card').onclick=()=>{ const c=$('card'); c.dataset.flip=c.dataset.flip==='true'?'false':'true'; };
-$('cprev').onclick=(e)=>{e.stopPropagation(); cardIdx=(cardIdx-1+CARDS.length)%CARDS.length; renderCard();};
-$('cnext').onclick=(e)=>{e.stopPropagation(); cardIdx=(cardIdx+1)%CARDS.length; renderCard();};
-renderCard();
-
-const io=new IntersectionObserver(es=>{es.forEach(e=>{if(e.isIntersecting){e.target.classList.add('in');io.unobserve(e.target);}});},{threshold:.12});
-document.querySelectorAll('.reveal').forEach(el=>io.observe(el));
-
-const canvas=$('net'), ctx=canvas.getContext('2d');
-let nodes=[], links=[], accent='#6E8FE0', motion=0, agentic=false, dpr=1, t=0;
-
-function resize(){
-  const r=canvas.parentElement.getBoundingClientRect();
-  dpr=Math.min(window.devicePixelRatio||1,2);
-  canvas.width=r.width*dpr; canvas.height=r.height*dpr;
-  ctx.setTransform(dpr,0,0,dpr,0,0);
-  if(nodes.length) layout(r.width,r.height);
-}
-function configureViz(i){
-  const p=PHASES[i]; accent=p.c;
-  const counts=[5,9,16,22,30,40,50]; const N=counts[i];
-  motion=i*0.16; agentic=i===6; const rigid=i===0;
-  const r=canvas.parentElement.getBoundingClientRect();
-  nodes=[]; for(let k=0;k<N;k++) nodes.push({grid:rigid,hub:false});
-  if(agentic)[0,1,2].forEach(h=>{ if(nodes[h]) nodes[h].hub=true; });
-  layout(r.width||320,r.height||230);
-  const density=0.10+i*0.06; links=[];
-  for(let a=0;a<nodes.length;a++)for(let b=a+1;b<nodes.length;b++){
-    const dx=nodes[a].x-nodes[b].x, dy=nodes[a].y-nodes[b].y, d=Math.hypot(dx,dy);
-    const reach=rigid?90:120+i*8;
-    if(d<reach && Math.random()<density+0.25) links.push([a,b,Math.random()]);
+  function readHash() {
+    try { return location.hash.slice(1); } catch (err) { return ''; }
   }
-}
-function layout(W,H){
-  const pad=30, rigid=nodes.length&&nodes[0].grid;
-  if(rigid){
-    const cols=Math.ceil(Math.sqrt(nodes.length));
-    nodes.forEach((n,k)=>{const cx=k%cols,cy=Math.floor(k/cols);
-      n.x=pad+cx*((W-2*pad)/(cols-1||1)); n.y=pad+cy*((H-2*pad)/(cols-1||1)); n.bx=n.x; n.by=n.y; n.ph=0;});
-  } else {
-    nodes.forEach(n=>{n.x=pad+Math.random()*(W-2*pad); n.y=pad+Math.random()*(H-2*pad); n.bx=n.x; n.by=n.y; n.ph=Math.random()*6.28;});
+
+  function show(id, opts) {
+    opts = opts || {};
+    var i = ids.indexOf(id);
+    if (i === -1) { i = 0; id = ids[0]; }
+    chapters.forEach(function (c) { c.hidden = (c.id !== id); });
+    chips.forEach(function (b) {
+      var on = b.dataset.target === id;
+      b.setAttribute('aria-current', on ? 'true' : 'false');
+      b.tabIndex = on ? 0 : -1;               // roving tabindex
+    });
+    if (opts.hash !== false) setHash(id);
+    var h = document.getElementById('h-' + (i + 1));
+    if (live && h) live.textContent = 'Chapter ' + (i + 1) + ' of 7: ' + h.textContent;
+    if (opts.focus && h) h.focus({ preventScroll: true });
+    if (opts.scroll) window.scrollTo({ top: document.getElementById('main').offsetTop - 12, behavior: 'auto' });
   }
-}
-function draw(){
-  const W=canvas.width/dpr, H=canvas.height/dpr;
-  ctx.clearRect(0,0,W,H); t+=0.016;
-  nodes.forEach(n=>{ if(!reduce&&motion>0&&!n.grid){ n.x=n.bx+Math.sin(t*0.8+n.ph)*motion*9; n.y=n.by+Math.cos(t*0.7+n.ph)*motion*9; }});
-  ctx.lineWidth=1;
-  links.forEach(([a,b,seed])=>{
-    const A=nodes[a],B=nodes[b]; if(!A||!B)return;
-    const alpha=0.18+0.10*Math.sin(t+seed*6);
-    ctx.strokeStyle=hexA(accent,Math.max(0.05,alpha*0.7));
-    ctx.beginPath(); ctx.moveTo(A.x,A.y); ctx.lineTo(B.x,B.y); ctx.stroke();
-    if(!reduce&&motion>0.4){ const tp=(t*0.4+seed)%1, px=A.x+(B.x-A.x)*tp, py=A.y+(B.y-A.y)*tp;
-      ctx.fillStyle=hexA(accent,0.9); ctx.beginPath(); ctx.arc(px,py,1.6,0,7); ctx.fill(); }
+  function current() {
+    var vis = chapters.filter(function (c) { return !c.hidden; })[0];
+    return vis ? ids.indexOf(vis.id) : 0;
+  }
+
+  chips.forEach(function (b) {
+    b.addEventListener('click', function () { show(b.dataset.target, { focus: true, scroll: true }); });
   });
-  nodes.forEach(n=>{
-    const r=n.hub?5.5:3;
-    if(n.hub){ ctx.fillStyle=hexA(accent,0.18); ctx.beginPath(); ctx.arc(n.x,n.y,12+Math.sin(t*2)*2,0,7); ctx.fill(); }
-    ctx.fillStyle=accent; ctx.beginPath(); ctx.arc(n.x,n.y,r,0,7); ctx.fill();
-    ctx.fillStyle=hexA(accent,0.25); ctx.beginPath(); ctx.arc(n.x,n.y,r+3,0,7); ctx.fill();
+
+  var nav = document.querySelector('.chapter-nav');
+  if (nav) nav.addEventListener('keydown', function (e) {
+    var i = chips.indexOf(document.activeElement);
+    if (i === -1) return;
+    var n = null;
+    if (e.key === 'ArrowRight' || e.key === 'ArrowDown') n = (i + 1) % chips.length;
+    else if (e.key === 'ArrowLeft' || e.key === 'ArrowUp') n = (i - 1 + chips.length) % chips.length;
+    else if (e.key === 'Home') n = 0;
+    else if (e.key === 'End') n = chips.length - 1;
+    if (n === null) return;
+    e.preventDefault();
+    chips[n].tabIndex = 0; chips[n].focus();
+    show(chips[n].dataset.target, { hash: true });
   });
-  requestAnimationFrame(draw);
-}
-window.addEventListener('resize',resize);
-resize(); select(0,false); requestAnimationFrame(draw);
+
+  document.addEventListener('click', function (e) {
+    var b = e.target.closest('[data-nav]');
+    if (!b || b.disabled) return;
+    var j = current() + (b.dataset.nav === 'next' ? 1 : -1);
+    if (j < 0 || j >= ids.length) return;
+    show(ids[j], { focus: true, scroll: true });
+  });
+
+  window.addEventListener('popstate', function () {
+    var id = readHash();
+    if (ids.indexOf(id) !== -1) show(id, { hash: false, focus: true });
+  });
+
+  var start = readHash();
+  show(ids.indexOf(start) !== -1 ? start : ids[0], { hash: false });
+
+  /* ============================================================
+     QUIZ
+     ============================================================ */
+  [].slice.call(document.querySelectorAll('.quiz-item')).forEach(function (item) {
+    var opts = [].slice.call(item.querySelectorAll('.opt'));
+    var fb = item.querySelector('.quiz-fb');
+    opts.forEach(function (o) {
+      o.addEventListener('click', function () {
+        o.dataset.state = o.dataset.correct === 'true' ? 'correct' : 'wrong';
+        opts.forEach(function (x) {
+          if (x.dataset.correct === 'true') x.dataset.state = 'correct';
+          x.disabled = true;
+        });
+        fb.hidden = false;
+      });
+    });
+  });
+
+  /* ============================================================
+     WIDGET 1 — Break Dot's rules
+     ============================================================ */
+  var P1 = {
+    bread:  { ok: true,  tag: 'Rule matched',  msg: 'Rule 1 matches: bread is in the slot. Dot pushes the lever, waits two minutes, pops it up. Toast! Dot is very pleased with itself.' },
+    bagel:  { ok: false, tag: 'No rule matched', msg: 'Dot checks every rule. None of them mention bagels. Dot does nothing. The bagel sits there, quietly not being toasted, forever.' },
+    frozen: { ok: false, tag: 'Rule matched — badly', msg: 'Rule 1 matches: it IS bread! Dot pushes the lever and waits exactly two minutes. Out comes bread that is warm, damp, and still frozen in the middle. The rule fired perfectly and the result is wrong.' },
+    foil:   { ok: false, tag: 'No rule matched', msg: 'There is no rule about forks. There is also no rule saying “do not put metal in the toaster.” Maya never thought to write one — which is the entire problem with rules.' }
+  };
+  var p1out = document.getElementById('p1out');
+  [].slice.call(document.querySelectorAll('[data-p1]')).forEach(function (b) {
+    b.addEventListener('click', function () {
+      var r = P1[b.dataset.p1];
+      [].slice.call(document.querySelectorAll('[data-p1]')).forEach(function (x) {
+        x.setAttribute('aria-pressed', x === b ? 'true' : 'false');
+      });
+      p1out.className = 'readout ' + (r.ok ? 'ok' : 'no');
+      p1out.innerHTML = '<span class="tag">' + r.tag + '</span>' + r.msg;
+    });
+  });
+
+  /* ============================================================
+     WIDGET 2 — Poison the training data
+     ============================================================ */
+  var dogSVG = function (grass) {
+    return '<svg viewBox="0 0 60 46" aria-hidden="true">' +
+      (grass ? '<rect x="0" y="34" width="60" height="12" fill="#6FD79E" opacity=".55"/>' : '<rect x="0" y="34" width="60" height="12" fill="#9C97C4" opacity=".28"/>') +
+      '<ellipse cx="28" cy="26" rx="14" ry="8" fill="#C5C1E4"/>' +
+      '<circle cx="42" cy="20" r="6" fill="#C5C1E4"/>' +
+      '<path d="M45 14 L49 8 L50 15 Z" fill="#C5C1E4"/>' +
+      '<circle cx="44" cy="19" r="1.4" fill="#1D1A42"/>' +
+      '<path d="M18 32 L14 40 M26 32 L26 40 M36 31 L38 40" stroke="#C5C1E4" stroke-width="2.5" stroke-linecap="round"/>' +
+      '<path d="M15 24 Q8 16 12 22" stroke="#C5C1E4" stroke-width="2.5" fill="none" stroke-linecap="round"/></svg>';
+  };
+  var catSVG = '<svg viewBox="0 0 60 46" aria-hidden="true">' +
+    '<rect x="0" y="34" width="60" height="12" fill="#9C97C4" opacity=".28"/>' +
+    '<circle cx="30" cy="24" r="11" fill="#C5C1E4"/>' +
+    '<path d="M21 16 L19 7 L27 13 Z M39 16 L41 7 L33 13 Z" fill="#C5C1E4"/>' +
+    '<circle cx="26" cy="23" r="1.5" fill="#1D1A42"/><circle cx="34" cy="23" r="1.5" fill="#1D1A42"/>' +
+    '<path d="M14 24 L22 26 M14 28 L22 28" stroke="#9C97C4" stroke-width="1.2"/></svg>';
+
+  var P2 = {
+    fixed: false, trained: false,
+    base: [
+      { t: 'dog', g: true }, { t: 'dog', g: true }, { t: 'dog', g: true },
+      { t: 'dog', g: true }, { t: 'dog', g: true }, { t: 'cat', g: false }
+    ],
+    extra: [ { t: 'dog', g: false }, { t: 'dog', g: false } ]
+  };
+  var p2cards = document.getElementById('p2cards');
+  var p2learn = document.getElementById('p2learn');
+  var p2out   = document.getElementById('p2out');
+  var p2train = document.getElementById('p2train');
+  var p2fix   = document.getElementById('p2fix');
+  var p2tests = [].slice.call(document.querySelectorAll('[data-p2test]'));
+
+  function p2render() {
+    var set = P2.base.concat(P2.fixed ? P2.extra : []);
+    p2cards.innerHTML = set.map(function (c) {
+      var art = c.t === 'dog' ? dogSVG(c.g) : catSVG;
+      var cap = c.t + (c.g ? ' · grass' : ' · no grass');
+      return '<div class="tcard">' + art + '<div class="cap">' + cap + '</div></div>';
+    }).join('');
+  }
+  function p2setTests(on) { p2tests.forEach(function (b) { b.disabled = !on; }); }
+
+  p2render(); 
+
+  p2train.addEventListener('click', function () {
+    P2.trained = true;
+    p2learn.className = 'readout no';
+    p2learn.innerHTML = '<span class="tag">Dot has learned a pattern</span>' +
+      '“Every single dog photo has green stuff along the bottom. The one without it isn\'t a dog. <strong>Therefore: green stuff at the bottom = dog.</strong>”<br><br>' +
+      'That rule scores <strong>6 out of 6</strong> on Maya\'s photos. Perfect marks. Now test it.';
+    p2setTests(true);
+    p2fix.disabled = false;
+    p2out.className = 'readout';
+    p2out.innerHTML = '<span class="tag">Ready</span>Try a test photo.';
+  });
+
+  p2fix.addEventListener('click', function () {
+    P2.fixed = true; P2.trained = true;
+    p2render();
+    p2learn.className = 'readout ok';
+    p2learn.innerHTML = '<span class="tag">Dot has learned a better pattern</span>' +
+      'Now some dogs have no grass, so “green = dog” stops scoring well. Dot is pushed to look at the actual animal — the shape, the ears, the legs.<br><br>' +
+      'Nothing about Dot changed. <strong>Only the examples changed.</strong>';
+    p2setTests(true);
+    p2out.className = 'readout';
+    p2out.innerHTML = '<span class="tag">Ready</span>Try the same tests again.';
+  });
+
+  var P2ANS = {
+    'dog-grass': {
+      broken: { ok: true,  tag: 'Dot says: “Dog!” — correct', msg: 'Right answer. But for the wrong reason: Dot spotted the grass, not the dog. It looks like it works, which is exactly what makes this so dangerous.' },
+      fixed:  { ok: true,  tag: 'Dot says: “Dog!” — correct', msg: 'Right answer, and now for the right reason — Dot is looking at the animal.' }
+    },
+    'lawn': {
+      broken: { ok: false, tag: 'Dot says: “Dog!” — wrong', msg: 'There is no dog. It is an empty lawn. But it is extremely green, and Dot learned that green means dog. Dot is completely confident.' },
+      fixed:  { ok: true,  tag: 'Dot says: “No dog.” — correct', msg: 'Grass alone no longer fools it. Dot is looking for an animal now.' }
+    },
+    'dog-snow': {
+      broken: { ok: false, tag: 'Dot says: “Not a dog.” — wrong', msg: 'It is very much a dog. It is standing in snow. No green, so — according to everything Maya taught it — no dog.' },
+      fixed:  { ok: true,  tag: 'Dot says: “Dog!” — correct', msg: 'Snow, grass, kitchen floor — doesn\'t matter any more. Dot learned the dog, not the background.' }
+    }
+  };
+  p2tests.forEach(function (b) {
+    b.addEventListener('click', function () {
+      if (!P2.trained) return;
+      var r = P2ANS[b.dataset.p2test][P2.fixed ? 'fixed' : 'broken'];
+      p2out.className = 'readout ' + (r.ok ? 'ok' : 'no');
+      p2out.innerHTML = '<span class="tag">' + r.tag + '</span>' + r.msg;
+    });
+  });
+  document.getElementById('p2reset').addEventListener('click', function () {
+    P2.fixed = false; P2.trained = false;
+    p2render(); p2setTests(false); p2fix.disabled = true;
+    p2learn.className = 'readout';
+    p2learn.innerHTML = '<span class="tag">Not trained yet</span>Press “Train Dot” to see what pattern it picks up.';
+    p2out.className = 'readout';
+    p2out.innerHTML = '<span class="tag">No test yet</span>Train Dot first, then try a test photo.';
+  });
+
+  /* ============================================================
+     WIDGET 3 — Be the predictor
+     ============================================================ */
+  var ROUNDS = [
+    { opts: [['time', 'very likely'], ['dream', 'unlikely'], ['hill', 'unlikely']] },
+    { opts: [['there', 'likely'], ['a', 'possible'], ['deep', 'unlikely']] },
+    { opts: [['was', 'very likely'], ['lived', 'likely'], ['sat', 'unlikely']] },
+    { opts: [['a', 'very likely'], ['one', 'unlikely'], ['no', 'unlikely']] },
+    { opts: [['dragon', 'likely'], ['bagel', 'unlikely'], ['girl', 'likely']] }
+  ];
+  var p3built = document.getElementById('p3built');
+  var p3ch = document.getElementById('p3choices');
+  var p3out = document.getElementById('p3out');
+  var p3 = { round: 0, words: [] };
+
+  function p3render() {
+    var html = '<span class="word seed">Once</span><span class="word seed">upon</span><span class="word seed">a</span>';
+    html += p3.words.map(function (w) { return '<span class="word">' + w + '</span>'; }).join('');
+    if (p3.round < ROUNDS.length) html += '<span class="caret" aria-hidden="true"></span>';
+    p3built.innerHTML = html;
+
+    if (p3.round < ROUNDS.length) {
+      p3ch.innerHTML = ROUNDS[p3.round].opts.map(function (o) {
+        return '<button class="choice" type="button" data-w="' + o[0] + '">' + o[0] +
+               '<span class="likely">' + o[1] + '</span></button>';
+      }).join('');
+    } else {
+      p3ch.innerHTML = '';
+    }
+  }
+  p3render();
+
+  p3ch.addEventListener('click', function (e) {
+    var b = e.target.closest('[data-w]');
+    if (!b) return;
+    p3.words.push(b.dataset.w);
+    p3.round++;
+    p3render();
+    if (p3.round < ROUNDS.length) {
+      p3out.className = 'readout';
+      p3out.innerHTML = '<span class="tag">Round ' + (p3.round + 1) + ' of ' + ROUNDS.length + '</span>Now pick the next one. Notice you barely have to think.';
+    } else {
+      var s = 'Once upon a ' + p3.words.join(' ');
+      p3out.className = 'readout ok';
+      p3out.innerHTML = '<span class="tag">That was the whole trick</span>' +
+        'You wrote: <strong>“' + s + '.”</strong><br><br>' +
+        'You never planned that sentence. You just picked a likely next word, five times, and a sentence appeared. ' +
+        '<strong>That is exactly what a language model does</strong> — except it does it thousands of times a second, having read more text than you could finish in a thousand lifetimes.<br><br>' +
+        'And here\'s the part to hold on to: <strong>at no point did you check whether any of it was true.</strong> Neither does it.';
+    }
+  });
+  document.getElementById('p3reset').addEventListener('click', function () {
+    p3 = { round: 0, words: [] }; p3render();
+    p3out.className = 'readout';
+    p3out.innerHTML = '<span class="tag">Round 1 of 5</span>Pick a word to follow “Once upon a”.';
+  });
+
+  /* ============================================================
+     FINAL ANSWER BOX  (mirrored into a div so it prints)
+     ============================================================ */
+  var ta = document.getElementById('final-answer');
+  var mirror = document.getElementById('print-answer');
+  document.getElementById('print-btn').addEventListener('click', function () {
+    mirror.textContent = ta.value || '(nothing written yet)';
+    window.print();
+  });
+  document.getElementById('clear-btn').addEventListener('click', function () { ta.value = ''; ta.focus(); });
+})();
 </script>
 </body>
 </html>
